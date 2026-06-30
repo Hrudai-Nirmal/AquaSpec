@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FilePlusIcon } from "lucide-react";
+import { FilePlusIcon, BookmarkIcon } from "lucide-react";
 import { StepIndicator } from "./StepIndicator";
 import { Step1Identity } from "./Step1Identity";
 import { Step2WaterProfile } from "./Step2WaterProfile";
@@ -12,6 +13,7 @@ import { Step4Disinfection } from "./Step4Disinfection";
 import { Step5Review } from "./Step5Review";
 import { ResultsPanel } from "@/components/results/ResultsPanel";
 import { ProposalPreview } from "@/components/proposal/ProposalPreview";
+import { SavedConfigsSidebar } from "@/components/configs/SavedConfigsSidebar";
 
 function StepContent() {
   const activeStep = useStore((s) => s.activeStep);
@@ -47,6 +49,7 @@ function StepTitle() {
 export function WizardContainer() {
   const isHydrated = useStore((s) => s.isHydrated);
   const clearDraft = useStore((s) => s.clearDraft);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -55,7 +58,7 @@ export function WizardContainer() {
         {/* Form panel (scrollable) */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8">
           <div className="max-w-2xl mx-auto">
-            {/* Header with title + New Configuration button */}
+            {/* Header with title + New Configuration button + Saved button */}
             <div className="flex items-start justify-between mb-1">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
@@ -65,17 +68,28 @@ export function WizardContainer() {
                   Lotus Ozone Water Treatment Sizing Wizard
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={async () => {
-                  await clearDraft();
-                }}
-                className="mt-1 shrink-0"
-              >
-                <FilePlusIcon className="size-4 mr-1" />
-                New
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="mt-1 shrink-0"
+                >
+                  <BookmarkIcon className="size-4 mr-1" />
+                  Saved
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    await clearDraft();
+                  }}
+                  className="mt-1 shrink-0"
+                >
+                  <FilePlusIcon className="size-4 mr-1" />
+                  New
+                </Button>
+              </div>
             </div>
 
             {/* Hydration guard: don't render form until state is loaded */}
@@ -122,6 +136,12 @@ export function WizardContainer() {
 
       {/* Proposal preview modal */}
       <ProposalPreview />
+
+      {/* Saved Configs Sidebar */}
+      <SavedConfigsSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
     </div>
   );
 }

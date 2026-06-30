@@ -2,12 +2,66 @@
 
 import { useStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2Icon, AlertTriangleIcon, CircleIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2Icon, AlertTriangleIcon, CircleIcon, RefreshCwIcon } from "lucide-react";
 import { FlowRateCard } from "./FlowRateCard";
 import { OzoneCard } from "./OzoneCard";
 import { UVCard } from "./UVCard";
 import { OxygenCard } from "./OxygenCard";
 import { AggregateSummary } from "./AggregateSummary";
+
+function VersionMismatchBanner() {
+  const triggerCompute = useStore((s) => s.triggerCompute);
+  const isComputing = useStore((s) => s.isComputing);
+
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+      <AlertTriangleIcon className="size-4 text-amber-600 mt-0.5 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-amber-800">
+          Equipment rules have been updated since this configuration was saved.
+          Results may be outdated.
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="shrink-0 border-amber-300 bg-white hover:bg-amber-100 text-amber-800"
+        onClick={() => triggerCompute()}
+        disabled={isComputing}
+      >
+        <RefreshCwIcon className="size-3 mr-1" />
+        Recompute
+      </Button>
+    </div>
+  );
+}
+
+function StaleEditsBanner() {
+  const triggerCompute = useStore((s) => s.triggerCompute);
+  const isComputing = useStore((s) => s.isComputing);
+
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+      <AlertTriangleIcon className="size-4 text-amber-600 mt-0.5 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-amber-800">
+          Results are based on old inputs. Recompute to refresh.
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="shrink-0 border-amber-300 bg-white hover:bg-amber-100 text-amber-800"
+        onClick={() => triggerCompute()}
+        disabled={isComputing}
+      >
+        <RefreshCwIcon className="size-3 mr-1" />
+        Recompute
+      </Button>
+    </div>
+  );
+}
 
 export function ResultsPanel() {
   const recommendation = useStore((s) => s.recommendation);
@@ -16,6 +70,8 @@ export function ResultsPanel() {
   const isValid = useStore((s) => s.isValid);
   const mode = useStore((s) => s.mode);
   const fieldErrors = useStore((s) => s.fieldErrors);
+  const showVersionMismatchBanner = useStore((s) => s.showVersionMismatchBanner);
+  const showStaleEditsBanner = useStore((s) => s.showStaleEditsBanner);
 
   const hasAnyFieldError = Object.keys(fieldErrors).length > 0;
   const isIncomplete = !isValid || hasAnyFieldError;
@@ -83,6 +139,10 @@ export function ResultsPanel() {
           </span>
         )}
       </h2>
+
+      {/* Banners */}
+      {showVersionMismatchBanner && <VersionMismatchBanner />}
+      {showStaleEditsBanner && <StaleEditsBanner />}
 
       {/* Per-system cards */}
       {recommendation.systems.map((sysRec, i) => (

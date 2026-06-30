@@ -17,6 +17,16 @@ import {
   clearDraft as clearPersistenceDraft,
   type DraftData,
 } from "./persistence";
+import {
+  saveConfig as saveConfigToDB,
+  loadConfig as loadConfigFromDB,
+  listConfigs as listConfigsFromDB,
+  deleteConfig as deleteConfigFromDB,
+  type ConfigRecord,
+} from "./config-persistence";
+import rulesData from "@/data/sizing-rules.json";
+
+const CURRENT_RULES_VERSION = rulesData.version;
 
 // ─── System-level form data (partial, allowing empty/incomplete) ───────────
 
@@ -151,6 +161,22 @@ function buildHatcheryInput(
   };
 }
 
+// ─── Stale detection helper ────────────────────────────────────────────────
+
+/** Pristine snapshot of the loaded config's input for stale-edit detection. */
+let pristineInput: z.infer<typeof HatcheryInput> | null = null;
+
+function setPristine(input: z.infer<typeof HatcheryInput>): void {
+  pristineInput = input;
+}
+
+function isDirty(): boolean {
+  if (pristineInput === null) return false;
+  const state = useStore.getState();
+  const current = buildHatcheryInput(state.hatcheryName, state.mode, state.systems);
+  return JSON.stringify(current) !== JSON.stringify(pristineInput);
+}
+
 // ─── Store Types ───────────────────────────────────────────────────────────
 
 interface FormState {
@@ -185,6 +211,15 @@ interface FormState {
   budgetaryEstimateEnabled: boolean;
   toggleBudgetaryEstimate: () => void;
 
+  // Saved configs
+  activeConfigId: string | null;
+  configs: ConfigRecord[];
+  configsLoaded: boolean;
+
+  // Banners
+  showVersionMismatchBanner: boolean;
+  showStaleEditsBanner: boolean;
+
   // Actions
   setActiveStep: (step: number) => void;
   setActiveSystemIndex: (index: number) => void;
@@ -201,6 +236,12 @@ interface FormState {
     systemType: string
   ) => Promise<void>;
   clearDraft: () => Promise<void>;
+
+  // Config actions
+  loadConfig: (id: string) => Promise<void>;
+  saveConfig: (name: string) => Promise<void>;
+  deleteConfig: (id: string) => Promise<void>;
+  loadConfigsList: () => Promise<void>;
 }
 
 // ─── Debounce & compute helpers ────────────────────────────────────────────
@@ -226,6 +267,15 @@ export const useStore = create<FormState>((set, get) => ({
   proposalOpen: false,
   budgetaryEstimateEnabled: false,
 
+  // Saved configs defaults
+  activeConfigId: null,
+  configs: [],
+  configsLoaded: false,
+
+  // Banners defaults
+  showVersionMismatchBanner: false,
+  showStaleEditsBanner: false,
+
   setActiveStep: (step) => set({ activeStep: Math.max(1, Math.min(5, step)) }),
 
   setActiveSystemIndex: (index) => set({ activeSystemIndex: index }),
@@ -245,6 +295,11 @@ export const useStore = create<FormState>((set, get) => ({
       }
       return {};
     });
+
+    // Stale detection: if an active config is loaded and form is dirty, show banner
+    if (get().activeConfigId !== null && isDirty()) {
+      set({ showStaleEditsBanner: true });
+    }
 
     // Run validation after 200ms for text/number, immediate rebuild of errors
     validateAndSchedule();
@@ -329,9 +384,38 @@ export const useStore = create<FormState>((set, get) => ({
 
       const recommendation: HatcheryRecommendation = await resp.json();
       set({ recommendation, isComputing: false });
-    } catch (e: any) {
+
+      // After successful compute: hide banners and auto-save loaded config
+      const currentState = get();
+      if (currentState.activeConfigId !== null) {
+        // Hide both banners
+        set({
+          showVersionMismatchBanner: false,
+          showStaleEditsBanner: false,
+        });
+
+        // Auto-save updated results + rules version to IndexedDB
+        const config = await loadConfigFromDB(currentState.activeConfigId);
+        if (config) {
+          config.recommendation = recommendation;
+          config.rulesVersionAtSave = CURRENT_RULES_VERSION;
+          config.savedAt = new Date().toISOString();
+          await saveConfigToDB(config);
+
+          // Update pristine snapshot
+          setPristine(hatcheryInput);
+
+          // Refresh configs list
+          await listConfigsFromDB().then((configs) =>
+            set({ configs, configsLoaded: true })
+          );
+        }
+      }
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "Unknown error";
       set({
-        computeError: e.message || "Unknown error",
+        computeError: message,
         isComputing: false,
         recommendation: null,
       });
@@ -341,7 +425,9 @@ export const useStore = create<FormState>((set, get) => ({
   setProposalOpen: (open) => set({ proposalOpen: open }),
 
   toggleBudgetaryEstimate: () =>
-    set((state) => ({ budgetaryEstimateEnabled: !state.budgetaryEstimateEnabled })),
+    set((state) => ({
+      budgetaryEstimateEnabled: !state.budgetaryEstimateEnabled,
+    })),
 
   fetchBiomassDefault: async (species, systemType) => {
     if (!species || !systemType) return;
@@ -383,7 +469,142 @@ export const useStore = create<FormState>((set, get) => ({
       isComputing: false,
       computeError: null,
       proposalOpen: false,
+      activeConfigId: null,
+      showVersionMismatchBanner: false,
+      showStaleEditsBanner: false,
     });
+    pristineInput = null;
+  },
+
+  // ─── Config Actions ────────────────────────────────────────────────────
+
+  loadConfig: async (id: string) => {
+    const state = get();
+
+    // If already loaded, no-op
+    if (state.activeConfigId === id) return;
+
+    // The UI should handle unsaved-work dialog before calling this.
+    // This function assumes the caller has already resolved unsaved work.
+
+    const config = await loadConfigFromDB(id);
+    if (!config) return;
+
+    // Populate form fields from config.input
+    const systems: SystemData[] = config.input.systems.map((sys) => ({
+      name: sys.name,
+      waterSource: sys.waterSource,
+      qualityBand: sys.qualityBand,
+      totalVolumeM3: String(sys.totalVolumeM3),
+      turnoversPerDay: String(sys.turnoversPerDay),
+      operatingHoursPerDay: String(sys.operatingHoursPerDay),
+      salinityPpt: String(sys.salinityPpt),
+      targetPathogen: sys.targetPathogen,
+      species: sys.species,
+      systemType: sys.systemType,
+      biomassDODemandM3Hr:
+        sys.biomassDODemandM3Hr !== undefined
+          ? String(sys.biomassDODemandM3Hr)
+          : "",
+    }));
+
+    // Check version mismatch
+    const versionMismatch =
+      config.rulesVersionAtSave !== CURRENT_RULES_VERSION;
+
+    set({
+      activeConfigId: config.id,
+      hatcheryName: config.input.name,
+      mode: config.input.mode,
+      systems,
+      activeStep: 1,
+      activeSystemIndex: 0,
+      fieldErrors: {},
+      isValid: true,
+      recommendation: config.recommendation,
+      budgetaryEstimateEnabled: config.includeBudgetaryEstimate,
+      isComputing: false,
+      computeError: null,
+      showVersionMismatchBanner: versionMismatch,
+      showStaleEditsBanner: false,
+    });
+
+    // Set pristine snapshot for stale-edit detection
+    setPristine(buildHatcheryInput(config.input.name, config.input.mode, systems));
+  },
+
+  saveConfig: async (name: string) => {
+    const state = get();
+
+    if (!state.recommendation) {
+      throw new Error("Cannot save without computed results");
+    }
+
+    const hatcheryInput = buildHatcheryInput(
+      state.hatcheryName,
+      state.mode,
+      state.systems
+    );
+
+    const configId =
+      state.activeConfigId ?? crypto.randomUUID();
+
+    const config: ConfigRecord = {
+      id: configId,
+      name,
+      savedAt: new Date().toISOString(),
+      input: hatcheryInput,
+      recommendation: state.recommendation,
+      rulesVersionAtSave: CURRENT_RULES_VERSION,
+      includeBudgetaryEstimate: state.budgetaryEstimateEnabled,
+    };
+
+    await saveConfigToDB(config);
+
+    set({
+      activeConfigId: configId,
+      showVersionMismatchBanner: false,
+      showStaleEditsBanner: false,
+    });
+
+    setPristine(hatcheryInput);
+
+    // Refresh configs list
+    await get().loadConfigsList();
+  },
+
+  deleteConfig: async (id: string) => {
+    await deleteConfigFromDB(id);
+
+    // If the deleted config was the active one, reset state
+    if (get().activeConfigId === id) {
+      await clearPersistenceDraft();
+      set({
+        hatcheryName: "",
+        mode: "aggregate",
+        activeStep: 1,
+        activeSystemIndex: 0,
+        systems: [{ ...emptySystem(), name: "System 1" }],
+        fieldErrors: {},
+        isValid: false,
+        recommendation: null,
+        isComputing: false,
+        computeError: null,
+        proposalOpen: false,
+        activeConfigId: null,
+        showVersionMismatchBanner: false,
+        showStaleEditsBanner: false,
+      });
+      pristineInput = null;
+    }
+
+    // Refresh configs list
+    await get().loadConfigsList();
+  },
+
+  loadConfigsList: async () => {
+    const configs = await listConfigsFromDB();
+    set({ configs, configsLoaded: true });
   },
 }));
 
@@ -432,7 +653,7 @@ useStore.subscribe((state) => {
   }, PERSIST_DEBOUNCE_MS);
 });
 
-// ─── Hydration: load draft from IndexedDB on init ──────────────────────────
+// ─── Hydration: load draft + configs list from IndexedDB on init ──────────
 
 // Kick off async hydration immediately (non-blocking)
 (async () => {
@@ -465,13 +686,17 @@ useStore.subscribe((state) => {
     // Mark hydration complete
     useStore.setState({ isHydrated: true });
 
+    // Load configs list after hydration
+    const configs = await listConfigsFromDB();
+    useStore.setState({ configs, configsLoaded: true });
+
     // If a draft was restored, trigger validation + debounced compute
     if (draft) {
       validateAndSchedule();
     }
   } catch {
     // If hydration fails for any reason, proceed with defaults
-    useStore.setState({ isHydrated: true });
+    useStore.setState({ isHydrated: true, configsLoaded: true });
   }
 })();
 
