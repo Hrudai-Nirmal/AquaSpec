@@ -172,6 +172,10 @@ interface FormState {
   // Proposal modal
   proposalOpen: boolean;
 
+  // Budgetary estimate toggle
+  budgetaryEstimateEnabled: boolean;
+  toggleBudgetaryEstimate: () => void;
+
   // Actions
   setActiveStep: (step: number) => void;
   setActiveSystemIndex: (index: number) => void;
@@ -209,6 +213,7 @@ export const useStore = create<FormState>((set, get) => ({
   computeError: null,
   biomassDefaults: {},
   proposalOpen: false,
+  budgetaryEstimateEnabled: false,
 
   setActiveStep: (step) => set({ activeStep: Math.max(1, Math.min(5, step)) }),
 
@@ -323,6 +328,9 @@ export const useStore = create<FormState>((set, get) => ({
   },
 
   setProposalOpen: (open) => set({ proposalOpen: open }),
+
+  toggleBudgetaryEstimate: () =>
+    set((state) => ({ budgetaryEstimateEnabled: !state.budgetaryEstimateEnabled })),
 
   fetchBiomassDefault: async (species, systemType) => {
     if (!species || !systemType) return;

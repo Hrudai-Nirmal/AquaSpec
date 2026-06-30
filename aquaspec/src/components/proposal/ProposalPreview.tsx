@@ -1,6 +1,7 @@
 "use client";
 
 import { useStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -12,18 +13,26 @@ import { Button } from "@/components/ui/button";
 import { FileDownIcon, XIcon } from "lucide-react";
 
 export function ProposalPreview() {
+  const router = useRouter();
   const proposalOpen = useStore((s) => s.proposalOpen);
   const setProposalOpen = useStore((s) => s.setProposalOpen);
   const hatcheryName = useStore((s) => s.hatcheryName);
   const mode = useStore((s) => s.mode);
   const systems = useStore((s) => s.systems);
   const recommendation = useStore((s) => s.recommendation);
+  const budgetaryEstimateEnabled = useStore((s) => s.budgetaryEstimateEnabled);
+  const toggleBudgetaryEstimate = useStore((s) => s.toggleBudgetaryEstimate);
 
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+  const handleDownload = () => {
+    setProposalOpen(false);
+    router.push("/proposal/preview");
+  };
 
   return (
     <Dialog open={proposalOpen} onOpenChange={setProposalOpen}>
@@ -159,15 +168,25 @@ export function ProposalPreview() {
             </Button>
           </DialogClose>
 
-          <Button
-            size="sm"
-            onClick={() =>
-              console.log("PDF generation not yet implemented")
-            }
-          >
-            <FileDownIcon className="size-4 mr-1" />
-            Download PDF
-          </Button>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={budgetaryEstimateEnabled}
+                onChange={toggleBudgetaryEstimate}
+                className="size-4 rounded border-gray-300 text-[#1F5DE1] focus:ring-[#1F5DE1]"
+              />
+              Include Budgetary Estimate
+            </label>
+
+            <Button
+              size="sm"
+              onClick={handleDownload}
+            >
+              <FileDownIcon className="size-4 mr-1" />
+              Download PDF
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
