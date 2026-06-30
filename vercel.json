@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd aquaspec && npm run build",
+  "installCommand": "cd aquaspec && npm install",
+  "outputDirectory": "aquaspec/.next",
+  "framework": "nextjs"
+}
