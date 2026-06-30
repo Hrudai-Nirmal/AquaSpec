@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-06-30T00:00:00Z",
+
+  "ozoneDoseRates": [
+    { "waterSource": "seawater",     "qualityBand": "good",     "doseRateGM3": 1.0 },
+    { "waterSource": "seawater",     "qualityBand": "moderate", "doseRateGM3": 1.5 },
+    { "waterSource": "seawater",     "qualityBand": "poor",     "doseRateGM3": 2.0 },
+    { "waterSource": "freshwater",   "qualityBand": "good",     "doseRateGM3": 0.8 },
+    { "waterSource": "freshwater",   "qualityBand": "moderate", "doseRateGM3": 1.2 },
+    { "waterSource": "freshwater",   "qualityBand": "poor",     "doseRateGM3": 1.8 },
+    { "waterSource": "borewell",     "qualityBand": "good",     "doseRateGM3": 1.0 },
+    { "waterSource": "borewell",     "qualityBand": "moderate", "doseRateGM3": 1.4 },
+    { "waterSource": "borewell",     "qualityBand": "poor",     "doseRateGM3": 2.0 },
+    { "waterSource": "estuary",      "qualityBand": "good",     "doseRateGM3": 1.2 },
+    { "waterSource": "estuary",      "qualityBand": "moderate", "doseRateGM3": 1.6 },
+    { "waterSource": "estuary",      "qualityBand": "poor",     "doseRateGM3": 2.2 }
+  ],
+
+  "ozoneGenerators": [
+    { "model": "LT-G-2",  "minCapacityGHr": 0,  "maxCapacityGHr": 2,   "oxygenFeedLPM": 3 },
+    { "model": "LT-G-5",  "minCapacityGHr": 2,  "maxCapacityGHr": 5,   "oxygenFeedLPM": 5 },
+    { "model": "LT-G-10", "minCapacityGHr": 5,  "maxCapacityGHr": 10,  "oxygenFeedLPM": 8 },
+    { "model": "LT-G-20", "minCapacityGHr": 10, "maxCapacityGHr": 20,  "oxygenFeedLPM": 15 },
+    { "model": "LT-G-30", "minCapacityGHr": 20, "maxCapacityGHr": 30,  "oxygenFeedLPM": 20 },
+    { "model": "LT-G-50", "minCapacityGHr": 30, "maxCapacityGHr": 50,  "oxygenFeedLPM": 30 },
+    { "model": "LT-G-80", "minCapacityGHr": 50, "maxCapacityGHr": 80,  "oxygenFeedLPM": 45 }
+  ],
+
+  "uvUnits": [
+    { "model": "LTU-T-50",  "ratedFlowM3Hr": 50 },
+    { "model": "LTU-T-100", "ratedFlowM3Hr": 100 },
+    { "model": "LTU-T-150", "ratedFlowM3Hr": 150 },
+    { "model": "LTU-T-200", "ratedFlowM3Hr": 200 },
+    { "model": "LTU-T-300", "ratedFlowM3Hr": 300 }
+  ],
+
+  "oxygenPackages": [
+    { "model": "LTX-5",   "minCapacityM3Hr": 0,   "maxCapacityM3Hr": 5 },
+    { "model": "LTX-10",  "minCapacityM3Hr": 5,   "maxCapacityM3Hr": 10 },
+    { "model": "LTX-20",  "minCapacityM3Hr": 10,  "maxCapacityM3Hr": 20 },
+    { "model": "LTX-40",  "minCapacityM3Hr": 20,  "maxCapacityM3Hr": 40 },
+    { "model": "LTX-80",  "minCapacityM3Hr": 40,  "maxCapacityM3Hr": 80 },
+    { "model": "LTX-M-10","minCapacityM3Hr": 0,   "maxCapacityM3Hr": 10 },
+    { "model": "LTX-M-20","minCapacityM3Hr": 10,  "maxCapacityM3Hr": 20 },
+    { "model": "LTX-M-40","minCapacityM3Hr": 20,  "maxCapacityM3Hr": 40 }
+  ],
+
+  "conditionAdjustments": [
+    {
+      "description": "High salinity + Vibrio target requires ozone safety factor",
+      "conditions": {
+        "salinityPpt": { "min": 25, "max": 50 },
+        "targetPathogen": ["vibrio"]
+      },
+      "ozoneMultiplier": 1.3,
+      "uvMultiplier": 1.0
+    },
+    {
+      "description": "WSSV target requires elevated UV dose",
+      "conditions": {
+        "targetPathogen": ["wssv"]
+      },
+      "ozoneMultiplier": 1.0,
+      "uvMultiplier": 1.2
+    },
+    {
+      "description": "Borewell water requires elevated ozone treatment",
+      "conditions": {
+        "waterSource": ["borewell"]
+      },
+      "ozoneMultiplier": 1.15,
+      "uvMultiplier": 1.0
+    },
+    {
+      "description": "Estuary water with Vibrio: combined safety factor",
+      "conditions": {
+        "waterSource": ["estuary"],
+        "targetPathogen": ["vibrio"]
+      },
+      "ozoneMultiplier": 1.4,
+      "uvMultiplier": 1.0
+    }
+  ],
+
+  "biomassDODefaults": [
+    { "species": "vannamei",  "systemType": "larval_rearing", "defaultDODemandM3Hr": 0.5 },
+    { "species": "vannamei",  "systemType": "broodstock",     "defaultDODemandM3Hr": 1.0 },
+    { "species": "vannamei",  "systemType": "algae_culture",  "defaultDODemandM3Hr": 0.3 },
+    { "species": "vannamei",  "systemType": "nauplii",        "defaultDODemandM3Hr": 0.2 },
+    { "species": "vannamei",  "systemType": "general",        "defaultDODemandM3Hr": 0.5 },
+    { "species": "monodon",   "systemType": "larval_rearing", "defaultDODemandM3Hr": 0.6 },
+    { "species": "monodon",   "systemType": "broodstock",     "defaultDODemandM3Hr": 1.2 },
+    { "species": "monodon",   "systemType": "algae_culture",  "defaultDODemandM3Hr": 0.3 },
+    { "species": "monodon",   "systemType": "nauplii",        "defaultDODemandM3Hr": 0.25 },
+    { "species": "monodon",   "systemType": "general",        "defaultDODemandM3Hr": 0.6 },
+    { "species": "indicus",   "systemType": "general",        "defaultDODemandM3Hr": 0.5 },
+    { "species": "other",     "systemType": "general",        "defaultDODemandM3Hr": 0.5 }
+  ]
+}
