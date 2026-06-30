@@ -67,11 +67,29 @@ A saved set of inputs and results representing one customer's water treatment si
 
 ---
 
+### Draft (Auto-Saved Form State)
+**Persistence:** Form data only — systems[], hatcheryName, mode, activeStep, activeSystemIndex. No computed results.
+**Behavior:** Auto-saved to IndexedDB on every field change (debounced 500ms). Silent restore on app open — user picks up exactly where they left off with no prompt.
+**Recompute:** Full re-compute triggered on restore. Results are always fresh against current rules.
+**Discard:** "New Configuration" button clears the draft and resets the store.
+**Scope:** Single draft per browser. One device only (not synced). Transient work-in-progress — not a permanent record.
+
+---
+
 ### Saved Configuration (Hatchery Config)
-**Persistence:** Full snapshot — all inputs + all computed results + rules file version metadata.
-**Reopen:** Display saved results; no auto-recompute.
-**Change Detection:** Compare stored rules version vs current rules file. Notify user on mismatch.
-**Recompute:** Manual trigger only, user-initiated.
+**Persistence:** Full snapshot — all inputs + all computed results + rules file version metadata. Stored in separate IndexedDB database `aquaspec-configs`, object store `configs`, keyed by UUID.
+**Save:** User clicks "Save Current" in sidebar → name dialog (first save) or silent overwrite (re-save). Duplicate names allowed (UUIDs are unique). Saves `HatcheryInput` (parsed values), `HatcheryRecommendation`, `rulesVersionAtSave`, `includeBudgetaryEstimate`.
+**Reopen:** Loads into wizard — populates form fields AND results panel. Displays saved results as-is; no auto-recompute. Active step resets to 1.
+**Unsaved Work:** Prompt dialog (Save & Load / Discard & Load / Cancel) when loading a config over in-progress work.
+**Change Detection:** On load, compare stored `rulesVersionAtSave` vs current `sizing-rules.json` version. Mismatch → version-mismatch banner in results panel.
+**Stale Edits Detection:** After loading, if user edits any form field → stale-edits banner in results panel.
+**Recompute:** Banner button only. Recomputes with current inputs + current rules. Auto-saves updated results to IndexedDB (same UUID).
+**Management:** Collapsible sidebar panel. Lists all saved configs (name, date, mode, rules version). Direct delete from sidebar. Click to load.
+
+### Configs Sidebar
+**Position:** Fixed overlay panel on right side (desktop) or full-width (mobile). Toggled via "Saved" button in wizard header.
+**Contents:** "Save Current" button + scrollable config list + empty state when no configs.
+**Behavior:** Highlighted row for currently loaded config. Delete with confirmation. Click row to load (with unsaved-work check).
 
 ---
 

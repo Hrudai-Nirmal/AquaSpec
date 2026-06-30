@@ -11,6 +11,12 @@ import {
   HatcheryInput,
   type HatcheryRecommendation,
 } from "./sizing-engine/types";
+import {
+  saveDraft,
+  loadDraft,
+  clearDraft as clearPersistenceDraft,
+  type DraftData,
+} from "./persistence";
 
 // ─── System-level form data (partial, allowing empty/incomplete) ───────────
 
@@ -152,6 +158,9 @@ interface FormState {
   activeStep: number;
   activeSystemIndex: number;
 
+  // Hydration
+  isHydrated: boolean;
+
   // Form data
   hatcheryName: string;
   mode: "aggregate" | "multi_system";
@@ -191,6 +200,7 @@ interface FormState {
     species: string,
     systemType: string
   ) => Promise<void>;
+  clearDraft: () => Promise<void>;
 }
 
 // ─── Debounce & compute helpers ────────────────────────────────────────────
@@ -203,6 +213,7 @@ const COMPUTE_DEBOUNCE_MS = 300;
 export const useStore = create<FormState>((set, get) => ({
   activeStep: 1,
   activeSystemIndex: 0,
+  isHydrated: false,
   hatcheryName: "",
   mode: "aggregate",
   systems: [{ ...emptySystem(), name: "System 1" }],
@@ -354,9 +365,115 @@ export const useStore = create<FormState>((set, get) => ({
       // silently fail; placeholder will just show nothing
     }
   },
+
+  clearDraft: async () => {
+    // Delete from IndexedDB
+    await clearPersistenceDraft();
+
+    // Reset store to default empty state
+    set({
+      hatcheryName: "",
+      mode: "aggregate",
+      activeStep: 1,
+      activeSystemIndex: 0,
+      systems: [{ ...emptySystem(), name: "System 1" }],
+      fieldErrors: {},
+      isValid: false,
+      recommendation: null,
+      isComputing: false,
+      computeError: null,
+      proposalOpen: false,
+    });
+  },
 }));
 
-// ─── Internal: validate all systems and schedule compute ───────────────────
+// ─── Persistence: debounced auto-save via subscribe ────────────────────────
+
+let persistTimeout: ReturnType<typeof setTimeout> | null = null;
+const PERSIST_DEBOUNCE_MS = 500;
+
+/** Extract only the persistable subset from the store state */
+function extractDraftData(state: FormState): DraftData {
+  return {
+    schemaVersion: 1,
+    hatcheryName: state.hatcheryName,
+    mode: state.mode,
+    activeStep: state.activeStep,
+    activeSystemIndex: state.activeSystemIndex,
+    systems: state.systems.map((s) => ({
+      name: s.name,
+      waterSource: s.waterSource,
+      qualityBand: s.qualityBand,
+      totalVolumeM3: s.totalVolumeM3,
+      turnoversPerDay: s.turnoversPerDay,
+      operatingHoursPerDay: s.operatingHoursPerDay,
+      salinityPpt: s.salinityPpt,
+      targetPathogen: s.targetPathogen,
+      species: s.species,
+      systemType: s.systemType,
+      biomassDODemandM3Hr: s.biomassDODemandM3Hr,
+    })),
+  };
+}
+
+// Subscribe to all state changes for auto-persist
+useStore.subscribe((state) => {
+  // Only persist after hydration is complete
+  if (!state.isHydrated) return;
+
+  // Debounce writes (independent of compute debounce)
+  if (persistTimeout) clearTimeout(persistTimeout);
+
+  persistTimeout = setTimeout(() => {
+    const current = useStore.getState();
+    // Guard again in case hydration was flipped between timer set and fire
+    if (!current.isHydrated) return;
+    saveDraft(extractDraftData(current));
+  }, PERSIST_DEBOUNCE_MS);
+});
+
+// ─── Hydration: load draft from IndexedDB on init ──────────────────────────
+
+// Kick off async hydration immediately (non-blocking)
+(async () => {
+  try {
+    const draft = await loadDraft();
+
+    if (draft) {
+      // Restore form state from draft
+      useStore.setState({
+        hatcheryName: draft.hatcheryName,
+        mode: draft.mode,
+        activeStep: draft.activeStep,
+        activeSystemIndex: draft.activeSystemIndex,
+        systems: draft.systems.map((s) => ({
+          name: s.name,
+          waterSource: s.waterSource,
+          qualityBand: s.qualityBand,
+          totalVolumeM3: s.totalVolumeM3,
+          turnoversPerDay: s.turnoversPerDay,
+          operatingHoursPerDay: s.operatingHoursPerDay,
+          salinityPpt: s.salinityPpt,
+          targetPathogen: s.targetPathogen,
+          species: s.species,
+          systemType: s.systemType,
+          biomassDODemandM3Hr: s.biomassDODemandM3Hr,
+        })),
+      });
+    }
+
+    // Mark hydration complete
+    useStore.setState({ isHydrated: true });
+
+    // If a draft was restored, trigger validation + debounced compute
+    if (draft) {
+      validateAndSchedule();
+    }
+  } catch {
+    // If hydration fails for any reason, proceed with defaults
+    useStore.setState({ isHydrated: true });
+  }
+})();
 
 function validateAndSchedule() {
   // Clear previous timeout
