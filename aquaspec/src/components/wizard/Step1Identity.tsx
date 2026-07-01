@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Step one collects the commercial contact details before technical sizing inputs.
+ */
+
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,49 +46,57 @@ export function Step1Identity() {
   const renameSystem = useStore((s) => s.renameSystem);
 
   return (
-    <div className="space-y-6">
-      <div className="glass-form rounded-xl border border-border/90 bg-white/32 p-5 backdrop-blur-xl space-y-5">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name *</Label>
+    <div className="space-y-8">
+      <div className="glass-form space-y-7 rounded-[28px] border border-border/90 bg-white/72 p-6 shadow-[0_28px_70px_-42px_rgba(15,23,42,0.22)] backdrop-blur-xl md:p-7">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-3">
+            <Label htmlFor="fullName" className="text-base text-foreground/90">
+              Full Name *
+            </Label>
             <Input
               id="fullName"
               placeholder="Enter your full name"
               value={fullName}
               onChange={(e) => updateField("fullName", e.target.value)}
+              aria-invalid={Boolean(fieldErrors["fullName"])}
+              className="bg-white/90"
             />
-            {fieldErrors["fullName"] && (
-              <p className="text-xs text-destructive">{fieldErrors["fullName"]}</p>
-            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="emailAddress">Email Address *</Label>
+          <div className="space-y-3">
+            <Label
+              htmlFor="emailAddress"
+              className="text-base text-foreground/90"
+            >
+              Email Address *
+            </Label>
             <Input
               id="emailAddress"
               type="email"
               placeholder="your.email@company.com"
               value={emailAddress}
               onChange={(e) => updateField("emailAddress", e.target.value)}
+              aria-invalid={Boolean(fieldErrors["emailAddress"])}
+              className="bg-white/90"
             />
-            {fieldErrors["emailAddress"] && (
-              <p className="text-xs text-destructive">
-                {fieldErrors["emailAddress"]}
-              </p>
-            )}
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-[160px_1fr]">
-          <div className="space-y-2">
-            <Label>Country Prefix *</Label>
+        <div className="grid gap-6 md:grid-cols-[190px_1fr]">
+          <div className="space-y-3">
+            <Label className="text-base text-foreground/90">
+              Country Prefix *
+            </Label>
             <Select
               value={phoneCountryCode}
               onValueChange={(value) => {
                 if (value) updateField("phoneCountryCode", value);
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger
+                aria-invalid={Boolean(fieldErrors["phoneCountryCode"])}
+                className="bg-white/90"
+              >
                 <SelectValue placeholder="+91" />
               </SelectTrigger>
               <SelectContent>
@@ -97,67 +109,70 @@ export function Step1Identity() {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phoneNumber">Phone Number *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="phoneNumber" className="text-base text-foreground/90">
+              Phone Number *
+            </Label>
             <Input
               id="phoneNumber"
               inputMode="tel"
               placeholder="+91 xxxxx xxxxx"
               value={phoneNumber}
               onChange={(e) => updateField("phoneNumber", e.target.value)}
+              aria-invalid={Boolean(fieldErrors["phoneNumber"])}
+              className="bg-white/90"
             />
-            {fieldErrors["phoneNumber"] && (
-              <p className="text-xs text-destructive">{fieldErrors["phoneNumber"]}</p>
-            )}
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="hatcheryName">Company Name *</Label>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-3">
+            <Label htmlFor="hatcheryName" className="text-base text-foreground/90">
+              Company Name *
+            </Label>
             <Input
               id="hatcheryName"
               placeholder="Your company name"
               value={hatcheryName}
               onChange={(e) => updateField("hatcheryName", e.target.value)}
+              aria-invalid={Boolean(fieldErrors["hatcheryName"])}
+              className="bg-white/90"
             />
-            {fieldErrors["hatcheryName"] && (
-              <p className="text-xs text-destructive">
-                {fieldErrors["hatcheryName"]}
-              </p>
-            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="location">Location *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="location" className="text-base text-foreground/90">
+              Location *
+            </Label>
             <Input
               id="location"
               placeholder="City, State, Country"
               value={location}
               onChange={(e) => updateField("location", e.target.value)}
+              aria-invalid={Boolean(fieldErrors["location"])}
+              className="bg-white/90"
             />
-            {fieldErrors["location"] && (
-              <p className="text-xs text-destructive">{fieldErrors["location"]}</p>
-            )}
           </div>
         </div>
       </div>
 
       {/* Mode Toggle */}
-      <div className="space-y-2">
-        <Label>Mode</Label>
+      <div className="space-y-3">
+        <Label className="text-base text-foreground/90">Mode</Label>
         <div className="flex gap-2">
           <Button
             variant={mode === "aggregate" ? "default" : "outline"}
-            size="sm"
+            size="default"
             onClick={() => setMode("aggregate")}
+            className="min-w-36 rounded-full"
           >
             Single System
           </Button>
           <Button
             variant={mode === "multi_system" ? "default" : "outline"}
-            size="sm"
+            size="default"
             onClick={() => setMode("multi_system")}
+            className="min-w-36 rounded-full"
           >
             Multi-System
           </Button>

@@ -1,11 +1,21 @@
 "use client";
 
+/**
+ * WizardContainer owns the branded shell, form rail, results rail, and supporting CTA sections.
+ */
+
 import { useState } from "react";
 import Image from "next/image";
 import { useStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FilePlusIcon, BookmarkIcon } from "lucide-react";
+import {
+  BookmarkIcon,
+  FilePlusIcon,
+  MessageCircleIcon,
+  PhoneCallIcon,
+  SendHorizonalIcon,
+} from "lucide-react";
 import { StepIndicator } from "./StepIndicator";
 import { Step1Identity } from "./Step1Identity";
 import { Step2WaterProfile } from "./Step2WaterProfile";
@@ -47,6 +57,99 @@ function StepTitle() {
   return <>{titles[activeStep] || ""}</>;
 }
 
+function JourneySection() {
+  const journeySteps = [
+    "Our experts review your requirements",
+    "We prepare a customised solution",
+    "You receive a detailed quote within 24hrs",
+  ];
+
+  return (
+    <section className="rounded-[30px] border border-border/80 bg-white p-6 shadow-[0_26px_70px_-46px_rgba(15,23,42,0.28)] md:p-8">
+      <div className="mx-auto max-w-3xl text-center">
+        <Button size="lg" className="rounded-full px-8">
+          <SendHorizonalIcon className="size-4 mr-2" />
+          Submit Quote Request
+        </Button>
+        <p className="mt-5 text-sm text-muted-foreground">
+          By submitting this form, you agree to be contacted by our technical
+          team regarding your requirements.
+        </p>
+      </div>
+
+      <div className="mt-7 rounded-[24px] border border-primary/10 bg-primary/6 px-6 py-7">
+        <h3 className="text-center font-sans text-2xl font-semibold text-foreground">
+          What happens next?
+        </h3>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {journeySteps.map((label, index) => (
+            <div key={label} className="flex items-center gap-4 rounded-2xl bg-white/72 p-4">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                {index + 1}
+              </span>
+              <p className="text-sm text-muted-foreground">{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactSection() {
+  return (
+    <section className="rounded-[34px] border border-border/75 bg-linear-to-b from-slate-50 to-white px-6 py-10 shadow-[0_26px_70px_-48px_rgba(15,23,42,0.2)] md:px-12">
+      <div className="mx-auto max-w-3xl text-center">
+        <h3 className="font-sans text-4xl font-semibold tracking-tight text-foreground">
+          Prefer to Speak Directly?
+        </h3>
+        <p className="mt-4 text-lg text-muted-foreground">
+          Our managing director is available for direct consultation on complex
+          projects.
+        </p>
+      </div>
+
+      <div className="mx-auto mt-10 grid max-w-3xl gap-6 md:grid-cols-2">
+        <article className="rounded-[28px] border border-border/75 bg-white p-7 text-center shadow-[0_24px_60px_-44px_rgba(15,23,42,0.28)]">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary/12 text-primary">
+            <PhoneCallIcon className="size-7" />
+          </div>
+          <h4 className="mt-5 font-sans text-2xl font-semibold text-foreground">
+            Direct Call
+          </h4>
+          <p className="mt-4 text-4xl font-semibold tracking-tight text-primary">
+            +91 97407 47096
+          </p>
+          <Button
+            variant="secondary"
+            className="mt-6 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
+          >
+            Call Srinivas Rao Karuturi
+          </Button>
+        </article>
+
+        <article className="rounded-[28px] border border-border/75 bg-white p-7 text-center shadow-[0_24px_60px_-44px_rgba(15,23,42,0.28)]">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <MessageCircleIcon className="size-7" />
+          </div>
+          <h4 className="mt-5 font-sans text-2xl font-semibold text-foreground">
+            WhatsApp
+          </h4>
+          <p className="mt-3 text-lg text-muted-foreground">
+            Quick consultation via chat
+          </p>
+          <Button
+            variant="outline"
+            className="mt-6 w-full rounded-full border-border/75 bg-white"
+          >
+            Chat on WhatsApp
+          </Button>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 /** Renders the branded wizard shell without changing sizing behavior. */
 export function WizardContainer() {
   const isHydrated = useStore((s) => s.isHydrated);
@@ -59,48 +162,67 @@ export function WizardContainer() {
     <div className="flex flex-col flex-1 min-h-0">
       <div className="h-[3px] shrink-0 bg-linear-to-r from-primary to-secondary" />
 
-      <header className="shrink-0 border-b border-border/80 bg-card/95 px-6 py-3 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <header className="shrink-0 border-b border-border/90 bg-white/95 px-6 py-5 shadow-[0_14px_40px_-32px_rgba(15,23,42,0.22)] backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-4">
             <Image
               src="/LotusOzoneLogo.png"
               alt="Lotus Ozone"
-              width={132}
-              height={57}
-              className="h-10 w-auto object-contain"
+              width={170}
+              height={74}
+              className="h-14 w-auto object-contain"
               priority
             />
             <div>
-              <h1 className="font-heading text-2xl font-semibold leading-none text-foreground">
+              <h1 className="font-heading text-4xl font-semibold leading-none text-foreground">
                 AquaSpec
               </h1>
-              <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
+              <p className="mt-2 text-sm tracking-[0.24em] text-muted-foreground uppercase">
                 Lotus Ozone Water Treatment Sizing Wizard
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="shrink-0 border border-border/70 bg-card/60 text-sm text-foreground hover:bg-secondary/30"
-            >
-              <BookmarkIcon className="size-4 mr-1" />
-              Saved
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={async () => {
-                await clearDraft();
-              }}
-              className="shrink-0 border border-border/70 bg-card/60 text-sm text-foreground hover:bg-secondary/30"
-            >
-              <FilePlusIcon className="size-4 mr-1" />
-              New
-            </Button>
+          <div className="flex flex-col gap-3 lg:items-end">
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href="tel:+919740747096"
+                className="inline-flex items-center gap-2 rounded-full border border-border/75 bg-white px-4 py-2 text-sm font-medium text-foreground shadow-[0_10px_30px_-24px_rgba(15,23,42,0.24)] transition-colors hover:bg-primary/6"
+              >
+                <PhoneCallIcon className="size-4 text-primary" />
+                Direct Call
+              </a>
+              <a
+                href="https://wa.me/919740747096"
+                className="inline-flex items-center gap-2 rounded-full border border-border/75 bg-white px-4 py-2 text-sm font-medium text-foreground shadow-[0_10px_30px_-24px_rgba(15,23,42,0.24)] transition-colors hover:bg-emerald-50"
+              >
+                <MessageCircleIcon className="size-4 text-emerald-600" />
+                WhatsApp
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="shrink-0 rounded-full border border-border/75 bg-white text-sm text-foreground hover:bg-secondary/15"
+              >
+                <BookmarkIcon className="size-4 mr-1" />
+                Saved
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  await clearDraft();
+                }}
+                className="shrink-0 rounded-full border border-border/75 bg-white text-sm text-foreground hover:bg-secondary/15"
+              >
+                <FilePlusIcon className="size-4 mr-1" />
+                New
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -108,8 +230,8 @@ export function WizardContainer() {
       {/* Main content area */}
       <div className="relative flex flex-1 flex-col overflow-hidden lg:flex-row min-h-0">
         {/* Form panel (scrollable) */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 lg:px-8">
-          <div className="max-w-[600px] mx-auto">
+        <div className="flex-1 overflow-y-auto px-4 py-8 lg:px-8">
+          <div className="mx-auto max-w-[720px]">
             {/* Hydration guard: don't render form until state is loaded */}
             {!isHydrated ? (
               <Card className="card-accent">
@@ -121,12 +243,12 @@ export function WizardContainer() {
               </Card>
             ) : (
               <>
-                <h2 className="mb-4 font-heading text-xl font-semibold text-foreground">
+                <h2 className="mb-5 font-heading text-[2rem] font-semibold text-foreground">
                   <StepTitle />
                 </h2>
 
-                <Card className="card-accent">
-                  <CardContent className="pt-6">
+                <Card className="card-accent shadow-[0_28px_80px_-52px_rgba(15,23,42,0.36)]">
+                  <CardContent className="pt-8">
                     <StepContent />
                   </CardContent>
                 </Card>
@@ -135,14 +257,19 @@ export function WizardContainer() {
           </div>
 
           {/* Mobile/Tablet: results below form */}
-          <div className="lg:hidden mt-6">
+          <div className="mt-8 lg:hidden">
             <ResultsPanel />
+          </div>
+
+          <div className="mx-auto mt-10 max-w-5xl space-y-8">
+            <JourneySection />
+            <ContactSection />
           </div>
         </div>
 
         {/* Desktop: results panel side-by-side */}
         {shouldShowDesktopResults ? (
-          <div className="hidden animate-slide-in-right border-l bg-card p-5 lg:flex lg:w-[420px] lg:overflow-y-auto">
+          <div className="hidden animate-slide-in-right border-l border-border/80 bg-white/96 p-6 lg:flex lg:w-[440px] lg:overflow-y-auto">
             <ResultsPanel />
           </div>
         ) : null}

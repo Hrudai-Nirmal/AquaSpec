@@ -102,8 +102,9 @@ A saved set of inputs and results representing one customer's water treatment si
 - **Data Files:** JSON (sizing rules, static pricing text)
 
 ## Visual System
-- **Brand Direction:** Lotus Ozone light-mode visual language using `#007979`, `#24B1B1`, `#6FD1D7`, and `#FFF0E4`, with the real `public/LotusOzoneLogo.png` in the header.
-- **Typography:** Inter for body and controls, Cormorant Garamond for headings, card titles, and key numeric values.
-- **Card Treatment:** Main wizard cards use a glassy teal accent treatment via the shared `.card-accent` class.
-- **Field Styling:** Inputs and selects use teal borders and sit inside a blurred glass contact panel on Step 1.
-- **Results Behavior:** The desktop results rail only appears once a recommendation exists; mobile keeps the inline results panel below the form.
+- **Brand Direction:** Lotus Ozone light-mode visual language uses a white page canvas with `#007979`, `#24B1B1`, and `#6FD1D7` accents, plus the real `public/LotusOzoneLogo.png` in the enlarged header.
+- **Typography:** Inter drives body copy and step numbers, while heading moments use the branded display stack already wired through `--font-heading`.
+- **Card Treatment:** Main wizard cards and support sections use soft white surfaces, clean teal borders, and restrained drop shadows instead of the earlier warm beige shell.
+- **Field Styling:** Inputs and selects keep colored borders, larger hit areas, and glassy white fills without inline red error copy.
+- **Navigation Feedback:** The sticky footer stepper blocks invalid forward movement and animates each section badge into green success or red error states.
+- **Support CTA Areas:** The form rail now continues into a “What happens next?” explainer and a direct-contact section with call and WhatsApp cards.

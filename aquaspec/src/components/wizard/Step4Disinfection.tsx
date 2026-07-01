@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Step four captures biological and treatment targets for the final sizing pass.
+ */
+
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
@@ -34,143 +38,135 @@ const SYSTEM_TYPES = [
   { value: "general", label: "General" },
 ];
 
-export function Step4Disinfection() {
+interface DisinfectionFieldsProps {
+  systemIndex: number;
+}
+
+function DisinfectionFields({ systemIndex }: DisinfectionFieldsProps) {
   const systems = useStore((s) => s.systems);
   const fieldErrors = useStore((s) => s.fieldErrors);
   const biomassDefaults = useStore((s) => s.biomassDefaults);
   const updateField = useStore((s) => s.updateField);
   const fetchBiomassDefault = useStore((s) => s.fetchBiomassDefault);
+  const sys = systems[systemIndex];
+  const prefix = `systems.${systemIndex}`;
+  const defaultKey = `${sys.species}|${sys.systemType}`;
+  const biomassDefault = biomassDefaults[defaultKey];
+
+  useEffect(() => {
+    if (sys.species && sys.systemType) {
+      void fetchBiomassDefault(sys.species, sys.systemType);
+    }
+  }, [fetchBiomassDefault, sys.species, sys.systemType]);
 
   return (
-    <SystemTabs>
-      {(systemIndex) => {
-        const sys = systems[systemIndex];
-        const prefix = `systems.${systemIndex}`;
-        const defaultKey = `${sys.species}|${sys.systemType}`;
-        const biomassDefault = biomassDefaults[defaultKey];
+    <div className="space-y-6">
+      {/* Target Pathogen */}
+      <div className="space-y-3">
+        <Label className="text-base text-foreground/90">Target Pathogen *</Label>
+        <Select
+          value={sys.targetPathogen || undefined}
+          onValueChange={(v) => {
+            if (v) updateField(`${prefix}.targetPathogen`, v);
+          }}
+        >
+          <SelectTrigger
+            aria-invalid={Boolean(fieldErrors[`${prefix}.targetPathogen`])}
+            className="bg-white/92"
+          >
+            <SelectValue placeholder="Select pathogen" />
+          </SelectTrigger>
+          <SelectContent>
+            {PATHOGENS.map((p) => (
+              <SelectItem key={p.value} value={p.value}>
+                {p.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        // Fetch default when species or systemType changes
-        useEffect(() => {
-          if (sys.species && sys.systemType) {
-            fetchBiomassDefault(sys.species, sys.systemType);
+      {/* Species */}
+      <div className="space-y-3">
+        <Label className="text-base text-foreground/90">Species *</Label>
+        <Select
+          value={sys.species || undefined}
+          onValueChange={(v) => {
+            if (v) updateField(`${prefix}.species`, v);
+          }}
+        >
+          <SelectTrigger
+            aria-invalid={Boolean(fieldErrors[`${prefix}.species`])}
+            className="bg-white/92"
+          >
+            <SelectValue placeholder="Select species" />
+          </SelectTrigger>
+          <SelectContent>
+            {SPECIES_LIST.map((species) => (
+              <SelectItem key={species.value} value={species.value}>
+                {species.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* System Type */}
+      <div className="space-y-3">
+        <Label className="text-base text-foreground/90">System Type *</Label>
+        <Select
+          value={sys.systemType || undefined}
+          onValueChange={(v) => {
+            if (v) updateField(`${prefix}.systemType`, v);
+          }}
+        >
+          <SelectTrigger
+            aria-invalid={Boolean(fieldErrors[`${prefix}.systemType`])}
+            className="bg-white/92"
+          >
+            <SelectValue placeholder="Select system type" />
+          </SelectTrigger>
+          <SelectContent>
+            {SYSTEM_TYPES.map((systemType) => (
+              <SelectItem key={systemType.value} value={systemType.value}>
+                {systemType.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Biomass DO Demand */}
+      <div className="space-y-3">
+        <Label htmlFor={`biomass-${systemIndex}`}>
+          Biomass DO Demand (m³/hr)
+        </Label>
+        <Input
+          id={`biomass-${systemIndex}`}
+          type="number"
+          min={0}
+          step="0.01"
+          placeholder={
+            biomassDefault !== undefined
+              ? `Default from rules (${biomassDefault.toFixed(2)} m³/hr)`
+              : "Optional — rules default will be used"
           }
-        }, [sys.species, sys.systemType, fetchBiomassDefault]);
+          value={sys.biomassDODemandM3Hr}
+          onChange={(e) =>
+            updateField(`${prefix}.biomassDODemandM3Hr`, e.target.value)
+          }
+          aria-invalid={Boolean(fieldErrors[`${prefix}.biomassDODemandM3Hr`])}
+          className="bg-white/92"
+        />
+      </div>
+    </div>
+  );
+}
 
-        return (
-          <div className="space-y-4">
-            {/* Target Pathogen */}
-            <div className="space-y-2">
-              <Label>Target Pathogen *</Label>
-              <Select
-                value={sys.targetPathogen || undefined}
-                onValueChange={(v) => {
-                  if (v) updateField(`${prefix}.targetPathogen`, v);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select pathogen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PATHOGENS.map((p) => (
-                    <SelectItem key={p.value} value={p.value}>
-                      {p.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors[`${prefix}.targetPathogen`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.targetPathogen`]}
-                </p>
-              )}
-            </div>
-
-            {/* Species */}
-            <div className="space-y-2">
-              <Label>Species *</Label>
-              <Select
-                value={sys.species || undefined}
-                onValueChange={(v) => {
-                  if (v) updateField(`${prefix}.species`, v);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select species" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SPECIES_LIST.map((s) => (
-                    <SelectItem key={s.value} value={s.value}>
-                      {s.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors[`${prefix}.species`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.species`]}
-                </p>
-              )}
-            </div>
-
-            {/* System Type */}
-            <div className="space-y-2">
-              <Label>System Type *</Label>
-              <Select
-                value={sys.systemType || undefined}
-                onValueChange={(v) => {
-                  if (v) updateField(`${prefix}.systemType`, v);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select system type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SYSTEM_TYPES.map((st) => (
-                    <SelectItem key={st.value} value={st.value}>
-                      {st.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors[`${prefix}.systemType`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.systemType`]}
-                </p>
-              )}
-            </div>
-
-            {/* Biomass DO Demand */}
-            <div className="space-y-2">
-              <Label htmlFor={`biomass-${systemIndex}`}>
-                Biomass DO Demand (m³/hr)
-              </Label>
-              <Input
-                id={`biomass-${systemIndex}`}
-                type="number"
-                min={0}
-                step="0.01"
-                placeholder={
-                  biomassDefault !== undefined
-                    ? `Default from rules (${biomassDefault.toFixed(2)} m³/hr)`
-                    : "Optional — rules default will be used"
-                }
-                value={sys.biomassDODemandM3Hr}
-                onChange={(e) =>
-                  updateField(
-                    `${prefix}.biomassDODemandM3Hr`,
-                    e.target.value
-                  )
-                }
-              />
-              {fieldErrors[`${prefix}.biomassDODemandM3Hr`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.biomassDODemandM3Hr`]}
-                </p>
-              )}
-            </div>
-          </div>
-        );
-      }}
+export function Step4Disinfection() {
+  return (
+    <SystemTabs>
+      {(systemIndex) => <DisinfectionFields systemIndex={systemIndex} />}
     </SystemTabs>
   );
 }

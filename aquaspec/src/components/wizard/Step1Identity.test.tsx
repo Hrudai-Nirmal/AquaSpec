@@ -11,7 +11,13 @@ const mockStoreState = {
   location: "",
   mode: "aggregate" as const,
   systems: [{ name: "System 1" }],
-  fieldErrors: {},
+  fieldErrors: {
+    fullName: "Full name is required",
+    emailAddress: "Email address is required",
+    phoneNumber: "Phone number is required",
+    hatcheryName: "Company name is required",
+    location: "Location is required",
+  },
   updateField: vi.fn(),
   setMode: vi.fn(),
   addSystem: vi.fn(),
@@ -25,7 +31,7 @@ vi.mock("@/lib/store", () => ({
 }));
 
 describe("Step1Identity", () => {
-  it("renders the new contact-first fields and phone prefix selector", () => {
+  it("renders the new contact-first fields without inline red error copy", () => {
     const markup = renderToStaticMarkup(<Step1Identity />);
 
     expect(markup).toContain("Full Name");
@@ -34,5 +40,10 @@ describe("Step1Identity", () => {
     expect(markup).toContain("Company Name");
     expect(markup).toContain("Location");
     expect(markup).toContain("+91");
+    expect(markup).not.toContain("Full name is required");
+    expect(markup).not.toContain("Email address is required");
+    expect(markup).not.toContain("Phone number is required");
+    expect(markup).not.toContain("Company name is required");
+    expect(markup).not.toContain("Location is required");
   });
 });

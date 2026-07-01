@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Step two captures the incoming water conditions for each configured system.
+ */
+
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,17 +41,22 @@ export function Step2WaterProfile() {
         const prefix = `systems.${systemIndex}`;
 
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Water Source */}
-            <div className="space-y-2">
-              <Label>Water Source *</Label>
+            <div className="space-y-3">
+              <Label className="text-base text-foreground/90">
+                Water Source *
+              </Label>
               <Select
                 value={sys.waterSource || undefined}
                 onValueChange={(v) => {
                   if (v) updateField(`${prefix}.waterSource`, v);
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  aria-invalid={Boolean(fieldErrors[`${prefix}.waterSource`])}
+                  className="bg-white/92"
+                >
                   <SelectValue placeholder="Select water source" />
                 </SelectTrigger>
                 <SelectContent>
@@ -58,23 +67,23 @@ export function Step2WaterProfile() {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors[`${prefix}.waterSource`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.waterSource`]}
-                </p>
-              )}
             </div>
 
             {/* Quality Band */}
-            <div className="space-y-2">
-              <Label>Quality Band *</Label>
+            <div className="space-y-3">
+              <Label className="text-base text-foreground/90">
+                Quality Band *
+              </Label>
               <Select
                 value={sys.qualityBand || undefined}
                 onValueChange={(v) => {
                   if (v) updateField(`${prefix}.qualityBand`, v);
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  aria-invalid={Boolean(fieldErrors[`${prefix}.qualityBand`])}
+                  className="bg-white/92"
+                >
                   <SelectValue placeholder="Select quality band" />
                 </SelectTrigger>
                 <SelectContent>
@@ -85,15 +94,10 @@ export function Step2WaterProfile() {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors[`${prefix}.qualityBand`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.qualityBand`]}
-                </p>
-              )}
             </div>
 
             {/* Salinity */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label htmlFor={`salinity-${systemIndex}`}>
                 Salinity (ppt) *
               </Label>
@@ -108,12 +112,9 @@ export function Step2WaterProfile() {
                 onChange={(e) =>
                   updateField(`${prefix}.salinityPpt`, e.target.value)
                 }
+                aria-invalid={Boolean(fieldErrors[`${prefix}.salinityPpt`])}
+                className="bg-white/92"
               />
-              {fieldErrors[`${prefix}.salinityPpt`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.salinityPpt`]}
-                </p>
-              )}
             </div>
           </div>
         );

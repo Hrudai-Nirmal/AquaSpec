@@ -105,7 +105,10 @@ describe("WizardContainer", () => {
 
     expect(incompletePanelCount).toBe(1);
     expect(incompleteMarkup).toContain("LotusOzoneLogo.png");
-    expect(incompleteMarkup).toContain("border-b border-border/80");
+    expect(incompleteMarkup).toContain("Direct Call");
+    expect(incompleteMarkup).toContain("WhatsApp");
+    expect(incompleteMarkup).toContain("What happens next?");
+    expect(incompleteMarkup).toContain("Prefer to Speak Directly?");
 
     mockStoreState.recommendation = mockRecommendation;
 
@@ -115,5 +118,6 @@ describe("WizardContainer", () => {
 
     expect(readyPanelCount).toBe(2);
     expect(readyMarkup).toContain("animate-slide-in-right");
+    expect(readyMarkup).toContain("Submit Quote Request");
   });
 });

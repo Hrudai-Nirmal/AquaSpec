@@ -24,6 +24,7 @@ import {
   deleteConfig as deleteConfigFromDB,
   type ConfigRecord,
 } from "./config-persistence";
+import { isStepValid, validateWizardState } from "./wizard-validation";
 import rulesData from "@/data/sizing-rules.json";
 
 const CURRENT_RULES_VERSION = rulesData.version;
@@ -58,81 +59,6 @@ export function emptySystem(): SystemData {
     systemType: "",
     biomassDODemandM3Hr: "",
   };
-}
-
-// ─── Validation (client-side) ──────────────────────────────────────────────
-
-function validateSystem(sys: SystemData): Record<string, string> {
-  const errors: Record<string, string> = {};
-
-  // name
-  if (!sys.name || sys.name.trim().length === 0) {
-    errors.name = "System name is required";
-  }
-
-  // waterSource
-  const wsResult = WaterSource.safeParse(sys.waterSource);
-  if (!wsResult.success) {
-    errors.waterSource = "Select a water source";
-  }
-
-  // qualityBand
-  const qbResult = QualityBand.safeParse(sys.qualityBand);
-  if (!qbResult.success) {
-    errors.qualityBand = "Select a quality band";
-  }
-
-  // totalVolumeM3
-  const vol = parseFloat(sys.totalVolumeM3);
-  if (isNaN(vol) || vol <= 0) {
-    errors.totalVolumeM3 = "Volume must be a positive number";
-  }
-
-  // turnoversPerDay
-  const turnovers = parseFloat(sys.turnoversPerDay);
-  if (isNaN(turnovers) || turnovers <= 0 || !Number.isInteger(turnovers)) {
-    errors.turnoversPerDay = "Must be a positive integer";
-  }
-
-  // operatingHoursPerDay
-  const hours = parseFloat(sys.operatingHoursPerDay);
-  if (isNaN(hours) || hours < 1 || hours > 24) {
-    errors.operatingHoursPerDay = "Must be between 1 and 24";
-  }
-
-  // salinityPpt
-  const salinity = parseFloat(sys.salinityPpt);
-  if (isNaN(salinity) || salinity < 0 || salinity > 50) {
-    errors.salinityPpt = "Must be between 0 and 50";
-  }
-
-  // targetPathogen
-  const tpResult = TargetPathogen.safeParse(sys.targetPathogen);
-  if (!tpResult.success) {
-    errors.targetPathogen = "Select a target pathogen";
-  }
-
-  // species
-  const spResult = Species.safeParse(sys.species);
-  if (!spResult.success) {
-    errors.species = "Select a species";
-  }
-
-  // systemType
-  const stResult = SystemType.safeParse(sys.systemType);
-  if (!stResult.success) {
-    errors.systemType = "Select a system type";
-  }
-
-  // biomassDODemandM3Hr — optional; if provided, must be >= 0
-  if (sys.biomassDODemandM3Hr !== "") {
-    const bio = parseFloat(sys.biomassDODemandM3Hr);
-    if (isNaN(bio) || bio < 0) {
-      errors.biomassDODemandM3Hr = "Must be 0 or positive";
-    }
-  }
-
-  return errors;
 }
 
 function buildHatcheryInput(
@@ -260,6 +186,7 @@ interface FormState {
     systemType: string
   ) => Promise<void>;
   clearDraft: () => Promise<void>;
+  validateStep: (step: number) => boolean;
 
   // Config actions
   loadConfig: (id: string) => Promise<void>;
@@ -393,6 +320,11 @@ export const useStore = create<FormState>((set, get) => ({
     }),
 
   setHatcheryName: (name) => set({ hatcheryName: name }),
+
+  validateStep: (step) => {
+    validateAndSchedule();
+    return isStepValid(get(), step);
+  },
 
   triggerCompute: async () => {
     const state = get();
@@ -788,63 +720,9 @@ function validateAndSchedule() {
 
   // Quick sync validation
   const state = useStore.getState();
-  const errors: Record<string, string> = {};
-  let allValid = true;
+  const { fieldErrors, isValid } = validateWizardState(state);
 
-  if (!state.hatcheryName || state.hatcheryName.trim().length === 0) {
-    errors["hatcheryName"] = "Company name is required";
-    allValid = false;
-  }
-
-  if (!state.fullName || state.fullName.trim().length === 0) {
-    errors["fullName"] = "Full name is required";
-    allValid = false;
-  }
-
-  if (!state.emailAddress || state.emailAddress.trim().length === 0) {
-    errors["emailAddress"] = "Email address is required";
-    allValid = false;
-  } else if (!z.email().safeParse(state.emailAddress).success) {
-    errors["emailAddress"] = "Enter a valid email address";
-    allValid = false;
-  }
-
-  if (!state.phoneCountryCode || state.phoneCountryCode.trim().length === 0) {
-    errors["phoneCountryCode"] = "Country code is required";
-    allValid = false;
-  }
-
-  if (!state.phoneNumber || state.phoneNumber.trim().length === 0) {
-    errors["phoneNumber"] = "Phone number is required";
-    allValid = false;
-  }
-
-  if (!state.location || state.location.trim().length === 0) {
-    errors["location"] = "Location is required";
-    allValid = false;
-  }
-
-  for (let i = 0; i < state.systems.length; i++) {
-    const sysErrors = validateSystem(state.systems[i]);
-    for (const [field, msg] of Object.entries(sysErrors)) {
-      errors[`systems.${i}.${field}`] = msg;
-    }
-    if (Object.keys(sysErrors).length > 0) allValid = false;
-  }
-
-  const isValid =
-    allValid &&
-    state.hatcheryName.trim().length > 0 &&
-    state.fullName.trim().length > 0 &&
-    state.emailAddress.trim().length > 0 &&
-    state.phoneCountryCode.trim().length > 0 &&
-    state.phoneNumber.trim().length > 0 &&
-    state.location.trim().length > 0 &&
-    (state.mode === "aggregate"
-      ? state.systems.length === 1
-      : state.systems.length >= 1);
-
-  useStore.setState({ fieldErrors: errors, isValid });
+  useStore.setState({ fieldErrors, isValid });
 
   // Schedule debounced compute if valid
   if (isValid) {

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Step three captures hydraulic sizing inputs that drive flow-rate calculations.
+ */
+
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,9 +21,9 @@ export function Step3Hydraulics() {
         const prefix = `systems.${systemIndex}`;
 
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Total Volume */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label htmlFor={`volume-${systemIndex}`}>
                 Total Volume (m³) *
               </Label>
@@ -33,16 +37,13 @@ export function Step3Hydraulics() {
                 onChange={(e) =>
                   updateField(`${prefix}.totalVolumeM3`, e.target.value)
                 }
+                aria-invalid={Boolean(fieldErrors[`${prefix}.totalVolumeM3`])}
+                className="bg-white/92"
               />
-              {fieldErrors[`${prefix}.totalVolumeM3`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.totalVolumeM3`]}
-                </p>
-              )}
             </div>
 
             {/* Turnovers Per Day */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label htmlFor={`turnovers-${systemIndex}`}>
                 Turnovers Per Day *
               </Label>
@@ -56,16 +57,13 @@ export function Step3Hydraulics() {
                 onChange={(e) =>
                   updateField(`${prefix}.turnoversPerDay`, e.target.value)
                 }
+                aria-invalid={Boolean(fieldErrors[`${prefix}.turnoversPerDay`])}
+                className="bg-white/92"
               />
-              {fieldErrors[`${prefix}.turnoversPerDay`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.turnoversPerDay`]}
-                </p>
-              )}
             </div>
 
             {/* Operating Hours */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label htmlFor={`hours-${systemIndex}`}>
                 Operating Hours Per Day *
               </Label>
@@ -83,12 +81,11 @@ export function Step3Hydraulics() {
                     e.target.value
                   )
                 }
+                aria-invalid={Boolean(
+                  fieldErrors[`${prefix}.operatingHoursPerDay`]
+                )}
+                className="bg-white/92"
               />
-              {fieldErrors[`${prefix}.operatingHoursPerDay`] && (
-                <p className="text-xs text-destructive">
-                  {fieldErrors[`${prefix}.operatingHoursPerDay`]}
-                </p>
-              )}
             </div>
           </div>
         );
