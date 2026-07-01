@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,17 +59,22 @@ export function WizardContainer() {
     <div className="flex flex-col flex-1 min-h-0">
       <div className="h-[3px] shrink-0 bg-linear-to-r from-primary to-secondary" />
 
-      <header className="shrink-0 border-b bg-card px-6 py-3">
+      <header className="shrink-0 border-b border-border/80 bg-card/95 px-6 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-primary to-secondary font-heading text-sm font-bold text-primary-foreground shadow-sm">
-              L
-            </div>
+            <Image
+              src="/LotusOzoneLogo.png"
+              alt="Lotus Ozone"
+              width={132}
+              height={57}
+              className="h-10 w-auto object-contain"
+              priority
+            />
             <div>
-              <h1 className="font-heading text-lg font-bold text-foreground">
+              <h1 className="font-heading text-2xl font-semibold leading-none text-foreground">
                 AquaSpec
               </h1>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
                 Lotus Ozone Water Treatment Sizing Wizard
               </p>
             </div>
@@ -79,7 +85,7 @@ export function WizardContainer() {
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="shrink-0 text-sm text-slate-700"
+              className="shrink-0 border border-border/70 bg-card/60 text-sm text-foreground hover:bg-secondary/30"
             >
               <BookmarkIcon className="size-4 mr-1" />
               Saved
@@ -90,7 +96,7 @@ export function WizardContainer() {
               onClick={async () => {
                 await clearDraft();
               }}
-              className="shrink-0 text-sm text-slate-700"
+              className="shrink-0 border border-border/70 bg-card/60 text-sm text-foreground hover:bg-secondary/30"
             >
               <FilePlusIcon className="size-4 mr-1" />
               New

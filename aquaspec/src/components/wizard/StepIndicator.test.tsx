@@ -13,12 +13,12 @@ vi.mock("@/lib/store", () => ({
 }));
 
 describe("StepIndicator", () => {
-  it("uses the branded active, complete, and navigation styles", () => {
+  it("uses the branded footer border and softened blur treatment", () => {
     const markup = renderToStaticMarkup(<StepIndicator />);
 
+    expect(markup).toContain("footer-frost");
+    expect(markup).toContain("border-t border-border/80");
     expect(markup).toContain("border-secondary bg-secondary text-secondary-foreground");
     expect(markup).toContain("border-primary bg-primary text-primary-foreground");
-    expect(markup).toContain("border-border bg-background");
-    expect(markup).toContain("bg-primary text-primary-foreground");
   });
 });

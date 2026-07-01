@@ -14,8 +14,8 @@ export function StepIndicator() {
   const setActiveStep = useStore((s) => s.setActiveStep);
 
   return (
-    <div className="sticky bottom-0 z-40 border-t bg-card shadow-[0_-12px_24px_-20px_rgba(15,23,42,0.2)]">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+    <div className="footer-frost sticky bottom-0 z-40 border-t border-border/80 bg-card/85 backdrop-blur-md shadow-[0_-18px_40px_-28px_rgba(63,70,80,0.42)]">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Button
           variant="outline"
           size="sm"

@@ -104,7 +104,8 @@ describe("WizardContainer", () => {
       incompleteMarkup.match(/data-testid="results-panel"/g)?.length ?? 0;
 
     expect(incompletePanelCount).toBe(1);
-    expect(incompleteMarkup).toContain("Lotus Ozone Water Treatment Sizing Wizard");
+    expect(incompleteMarkup).toContain("LotusOzoneLogo.png");
+    expect(incompleteMarkup).toContain("border-b border-border/80");
 
     mockStoreState.recommendation = mockRecommendation;
 
