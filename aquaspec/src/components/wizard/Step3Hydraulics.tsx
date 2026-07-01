@@ -6,7 +6,7 @@
 
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FieldHint } from "./FieldHint";
 import { SystemTabs } from "./SystemTabs";
 
 export function Step3Hydraulics() {
@@ -24,9 +24,12 @@ export function Step3Hydraulics() {
           <div className="space-y-6">
             {/* Total Volume */}
             <div className="space-y-3">
-              <Label htmlFor={`volume-${systemIndex}`}>
+              <FieldHint
+                htmlFor={`volume-${systemIndex}`}
+                hint="Total volume is the complete water volume that needs to be turned over through treatment."
+              >
                 Total Volume (m³) *
-              </Label>
+              </FieldHint>
               <Input
                 id={`volume-${systemIndex}`}
                 type="number"
@@ -44,9 +47,12 @@ export function Step3Hydraulics() {
 
             {/* Turnovers Per Day */}
             <div className="space-y-3">
-              <Label htmlFor={`turnovers-${systemIndex}`}>
+              <FieldHint
+                htmlFor={`turnovers-${systemIndex}`}
+                hint="Turnovers per day define how many full treatment cycles the system should complete each day."
+              >
                 Turnovers Per Day *
-              </Label>
+              </FieldHint>
               <Input
                 id={`turnovers-${systemIndex}`}
                 type="number"
@@ -64,9 +70,12 @@ export function Step3Hydraulics() {
 
             {/* Operating Hours */}
             <div className="space-y-3">
-              <Label htmlFor={`hours-${systemIndex}`}>
+              <FieldHint
+                htmlFor={`hours-${systemIndex}`}
+                hint="Operating hours set how many hours per day the treatment train is expected to run."
+              >
                 Operating Hours Per Day *
-              </Label>
+              </FieldHint>
               <Input
                 id={`hours-${systemIndex}`}
                 type="number"

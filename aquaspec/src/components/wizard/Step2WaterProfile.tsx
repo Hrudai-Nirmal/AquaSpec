@@ -6,7 +6,6 @@
 
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -14,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FieldHint } from "./FieldHint";
 import { SystemTabs } from "./SystemTabs";
 
 const WATER_SOURCES = [
@@ -44,9 +44,9 @@ export function Step2WaterProfile() {
           <div className="space-y-6">
             {/* Water Source */}
             <div className="space-y-3">
-              <Label className="text-base text-foreground/90">
+              <FieldHint hint="Choose the intake source because source water changes the treatment assumptions.">
                 Water Source *
-              </Label>
+              </FieldHint>
               <Select
                 value={sys.waterSource || undefined}
                 onValueChange={(v) => {
@@ -71,9 +71,9 @@ export function Step2WaterProfile() {
 
             {/* Quality Band */}
             <div className="space-y-3">
-              <Label className="text-base text-foreground/90">
+              <FieldHint hint="Quality band tells the sizing rules how clean or fouled the incoming water typically is.">
                 Quality Band *
-              </Label>
+              </FieldHint>
               <Select
                 value={sys.qualityBand || undefined}
                 onValueChange={(v) => {
@@ -98,9 +98,12 @@ export function Step2WaterProfile() {
 
             {/* Salinity */}
             <div className="space-y-3">
-              <Label htmlFor={`salinity-${systemIndex}`}>
+              <FieldHint
+                htmlFor={`salinity-${systemIndex}`}
+                hint="Enter the operating salinity in parts per thousand to tune the treatment dose assumptions."
+              >
                 Salinity (ppt) *
-              </Label>
+              </FieldHint>
               <Input
                 id={`salinity-${systemIndex}`}
                 type="number"

@@ -105,6 +105,6 @@ A saved set of inputs and results representing one customer's water treatment si
 - **Brand Direction:** Lotus Ozone light-mode visual language uses a white page canvas with `#007979`, `#24B1B1`, and `#6FD1D7` accents, plus the real `public/LotusOzoneLogo.png` in the enlarged header.
 - **Typography:** Inter drives body copy and step numbers, while heading moments use the branded display stack already wired through `--font-heading`.
 - **Card Treatment:** Main wizard cards and support sections use soft white surfaces, clean teal borders, and restrained drop shadows instead of the earlier warm beige shell.
-- **Field Styling:** Inputs and selects keep colored borders, larger hit areas, and glassy white fills without inline red error copy.
-- **Navigation Feedback:** The main wizard card now uses a combined ReactBits-style stepper shell that blocks invalid forward movement and animates each section badge into green success or red error states.
+- **Field Styling:** Inputs and selects keep colored borders, larger hit areas, and glassy white fills without inline red error copy, while steps 2-4 include compact info icons for field guidance.
+- **Navigation Feedback:** The main wizard card now uses a combined ReactBits-style stepper shell that advances between sections while marking incomplete ones red and completed ones green.
 - **Support CTA Areas:** The form rail now continues into a “What happens next?” explainer and a direct-contact section with call and WhatsApp cards.

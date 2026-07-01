@@ -144,13 +144,13 @@ export function WizardContainer() {
 
       <header className="shrink-0 border-b border-border/90 bg-white/95 px-6 py-5 shadow-[0_14px_40px_-32px_rgba(15,23,42,0.22)] backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
+          <div className="-ml-2 flex items-center gap-3 lg:-ml-4">
             <Image
               src="/LotusOzoneLogo.png"
               alt="Lotus Ozone"
-              width={170}
-              height={74}
-              className="h-14 w-auto object-contain"
+              width={226}
+              height={98}
+              className="h-18 w-auto object-contain md:h-20"
               priority
             />
             <div>

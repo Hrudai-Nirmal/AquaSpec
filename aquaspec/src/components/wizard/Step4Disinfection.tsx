@@ -7,7 +7,6 @@
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -15,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FieldHint } from "./FieldHint";
 import { SystemTabs } from "./SystemTabs";
 
 const PATHOGENS = [
@@ -63,7 +63,9 @@ function DisinfectionFields({ systemIndex }: DisinfectionFieldsProps) {
     <div className="space-y-6">
       {/* Target Pathogen */}
       <div className="space-y-3">
-        <Label className="text-base text-foreground/90">Target Pathogen *</Label>
+        <FieldHint hint="Pick the main treatment target so the rules can size for the most critical disinfection case.">
+          Target Pathogen *
+        </FieldHint>
         <Select
           value={sys.targetPathogen || undefined}
           onValueChange={(v) => {
@@ -88,7 +90,9 @@ function DisinfectionFields({ systemIndex }: DisinfectionFieldsProps) {
 
       {/* Species */}
       <div className="space-y-3">
-        <Label className="text-base text-foreground/90">Species *</Label>
+        <FieldHint hint="Species selection helps load the default biomass oxygen demand for the culture type.">
+          Species *
+        </FieldHint>
         <Select
           value={sys.species || undefined}
           onValueChange={(v) => {
@@ -113,7 +117,9 @@ function DisinfectionFields({ systemIndex }: DisinfectionFieldsProps) {
 
       {/* System Type */}
       <div className="space-y-3">
-        <Label className="text-base text-foreground/90">System Type *</Label>
+        <FieldHint hint="System type aligns the design assumptions with the hatchery zone being treated.">
+          System Type *
+        </FieldHint>
         <Select
           value={sys.systemType || undefined}
           onValueChange={(v) => {
@@ -138,9 +144,12 @@ function DisinfectionFields({ systemIndex }: DisinfectionFieldsProps) {
 
       {/* Biomass DO Demand */}
       <div className="space-y-3">
-        <Label htmlFor={`biomass-${systemIndex}`}>
+        <FieldHint
+          htmlFor={`biomass-${systemIndex}`}
+          hint="Override this only if you already know the oxygen demand from biomass; otherwise the rules default is used."
+        >
           Biomass DO Demand (m³/hr)
-        </Label>
+        </FieldHint>
         <Input
           id={`biomass-${systemIndex}`}
           type="number"

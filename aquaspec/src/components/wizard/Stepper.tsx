@@ -88,6 +88,7 @@ export default function Stepper({
     Partial<Record<number, StepFeedbackStatus>>
   >({});
   const [animatedStep, setAnimatedStep] = useState<number | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const totalSteps = stepPanels.length;
   const resolvedCurrentStep = currentStep ?? internalStep;
   const isLastStep = resolvedCurrentStep === totalSteps;
@@ -112,20 +113,28 @@ export default function Stepper({
     }
   }
 
-  function canAdvanceToStep(targetStep: number): boolean {
+  function updateIntermediateStepStatuses(targetStep: number) {
     if (!canAdvanceFromStep || targetStep <= resolvedCurrentStep) {
-      return true;
+      setStatusMessage(null);
+      return;
     }
+
+    let encounteredInvalidStep = false;
 
     for (let step = resolvedCurrentStep; step < targetStep; step += 1) {
-      if (!canAdvanceFromStep(step)) {
-        triggerStepFeedback(step, "error");
-        return false;
+      const isStepValid = canAdvanceFromStep(step);
+      triggerStepFeedback(step, isStepValid ? "success" : "error");
+
+      if (!isStepValid) {
+        encounteredInvalidStep = true;
       }
-      triggerStepFeedback(step, "success");
     }
 
-    return true;
+    setStatusMessage(
+      encounteredInvalidStep
+        ? "This section is marked incomplete in red. You can keep moving and return to finish it."
+        : null
+    );
   }
 
   function handleStepChange(targetStep: number) {
@@ -133,20 +142,20 @@ export default function Stepper({
       return;
     }
 
-    if (!canAdvanceToStep(targetStep)) {
-      return;
-    }
-
+    updateIntermediateStepStatuses(targetStep);
     setStep(targetStep);
   }
 
   function handleComplete() {
     if (canAdvanceFromStep && !canAdvanceFromStep(resolvedCurrentStep)) {
       triggerStepFeedback(resolvedCurrentStep, "error");
-      return;
+      setStatusMessage(
+        "This section is marked incomplete in red. You can keep moving and return to finish it."
+      );
+    } else {
+      triggerStepFeedback(resolvedCurrentStep, "success");
+      setStatusMessage(null);
     }
-
-    triggerStepFeedback(resolvedCurrentStep, "success");
     onFinalStepCompleted?.();
   }
 
@@ -279,6 +288,9 @@ export default function Stepper({
             footerClassName
           )}
         >
+          {statusMessage ? (
+            <p className="mb-3 text-sm text-red-500">{statusMessage}</p>
+          ) : null}
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="outline"
