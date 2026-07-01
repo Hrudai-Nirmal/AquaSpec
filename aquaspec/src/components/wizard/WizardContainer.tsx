@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FilePlusIcon, BookmarkIcon } from "lucide-react";
 import { StepIndicator } from "./StepIndicator";
@@ -46,55 +46,67 @@ function StepTitle() {
   return <>{titles[activeStep] || ""}</>;
 }
 
+/** Renders the branded wizard shell without changing sizing behavior. */
 export function WizardContainer() {
   const isHydrated = useStore((s) => s.isHydrated);
   const clearDraft = useStore((s) => s.clearDraft);
+  const recommendation = useStore((s) => s.recommendation);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const shouldShowDesktopResults = recommendation !== null;
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
-        {/* Form panel (scrollable) */}
-        <div className="flex-1 overflow-y-auto p-4 lg:p-6 xl:p-8">
-          <div className="max-w-2xl mx-auto">
-            {/* Header with title + New Configuration button + Saved button */}
-            <div className="flex items-start justify-between mb-1">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                  AquaSpec
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Lotus Ozone Water Treatment Sizing Wizard
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="mt-1 shrink-0"
-                >
-                  <BookmarkIcon className="size-4 mr-1" />
-                  Saved
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={async () => {
-                    await clearDraft();
-                  }}
-                  className="mt-1 shrink-0"
-                >
-                  <FilePlusIcon className="size-4 mr-1" />
-                  New
-                </Button>
-              </div>
-            </div>
+      <div className="h-[3px] shrink-0 bg-linear-to-r from-primary to-secondary" />
 
+      <header className="shrink-0 border-b bg-card px-6 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-primary to-secondary font-heading text-sm font-bold text-primary-foreground shadow-sm">
+              L
+            </div>
+            <div>
+              <h1 className="font-heading text-lg font-bold text-foreground">
+                AquaSpec
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                Lotus Ozone Water Treatment Sizing Wizard
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="shrink-0 text-sm text-slate-700"
+            >
+              <BookmarkIcon className="size-4 mr-1" />
+              Saved
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await clearDraft();
+              }}
+              className="shrink-0 text-sm text-slate-700"
+            >
+              <FilePlusIcon className="size-4 mr-1" />
+              New
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content area */}
+      <div className="relative flex flex-1 flex-col overflow-hidden lg:flex-row min-h-0">
+        {/* Form panel (scrollable) */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 lg:px-8">
+          <div className="max-w-[600px] mx-auto">
             {/* Hydration guard: don't render form until state is loaded */}
             {!isHydrated ? (
-              <Card>
+              <Card className="card-accent">
                 <CardContent className="py-12">
                   <div className="flex items-center justify-center">
                     <p className="text-muted-foreground text-sm">Loading...</p>
@@ -103,15 +115,12 @@ export function WizardContainer() {
               </Card>
             ) : (
               <>
-                <div className="mb-6" />
+                <h2 className="mb-4 font-heading text-xl font-semibold text-foreground">
+                  <StepTitle />
+                </h2>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      <StepTitle />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <Card className="card-accent">
+                  <CardContent className="pt-6">
                     <StepContent />
                   </CardContent>
                 </Card>
@@ -126,9 +135,11 @@ export function WizardContainer() {
         </div>
 
         {/* Desktop: results panel side-by-side */}
-        <div className="hidden lg:flex lg:w-[420px] xl:w-[480px] border-l overflow-y-auto p-4 lg:p-6">
-          <ResultsPanel />
-        </div>
+        {shouldShowDesktopResults ? (
+          <div className="hidden animate-slide-in-right border-l bg-card p-5 lg:flex lg:w-[420px] lg:overflow-y-auto">
+            <ResultsPanel />
+          </div>
+        ) : null}
       </div>
 
       {/* Bottom navigation */}

@@ -6,16 +6,14 @@ interface Props {
   result: FlowRateResult;
 }
 
+/** Highlights the computed system flow as the first result card. */
 export function FlowRateCard({ result }: Props) {
   return (
-    <div className="rounded-lg bg-muted/50 p-3 space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Flow Rate
-        </span>
-        <span className="text-sm font-bold">
-          {result.flowRateM3Hr.toFixed(2)} m³/hr
-        </span>
+    <div className="result-card space-y-2">
+      <div className="result-card-label">Flow Rate</div>
+      <div className="result-card-value">
+        {result.flowRateM3Hr.toFixed(2)}
+        <span className="result-card-unit ml-1">m³/hr</span>
       </div>
       <p className="text-[11px] text-muted-foreground">
         {result.inputs.totalVolumeM3} m³ × {result.inputs.turnoversPerDay}{" "}

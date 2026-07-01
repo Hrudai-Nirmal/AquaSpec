@@ -6,16 +6,18 @@ interface Props {
   result: OxygenDemandResult;
 }
 
+/** Shows the oxygen package alongside the total demand it must satisfy. */
 export function OxygenCard({ result }: Props) {
   return (
-    <div className="rounded-lg bg-muted/50 p-3 space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Oxygen
-        </span>
-        <span className="text-sm font-bold">
-          {result.totalOxygenDemandM3Hr.toFixed(3)} m³/hr →{" "}
+    <div className="result-card space-y-2">
+      <div className="result-card-label">Oxygen Package</div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="model-tag bg-cyan-50 text-cyan-700 border-cyan-100">
           {result.selectedModel}
+        </span>
+        <span className="result-card-value text-base">
+          {result.totalOxygenDemandM3Hr.toFixed(3)}
+          <span className="result-card-unit ml-1">m³/hr total</span>
         </span>
       </div>
       <p className="text-[11px] text-muted-foreground">

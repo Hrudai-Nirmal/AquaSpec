@@ -1,24 +1,21 @@
 "use client";
 
+import { Fragment } from "react";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const STEP_LABELS = [
-  "Identity",
-  "Water Profile",
-  "Hydraulics",
-  "Disinfection",
-  "Review",
-];
+const STEP_LABELS = ["Identity", "Water", "Hydraulics", "Disinfect", "Review"];
 
+/** Keeps the wizard navigation readable while reflecting the branded states. */
 export function StepIndicator() {
   const activeStep = useStore((s) => s.activeStep);
   const setActiveStep = useStore((s) => s.setActiveStep);
 
   return (
-    <div className="sticky bottom-0 z-40 border-t bg-background shadow-lg">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+    <div className="sticky bottom-0 z-40 border-t bg-card shadow-[0_-12px_24px_-20px_rgba(15,23,42,0.2)]">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Button
           variant="outline"
           size="sm"
@@ -29,43 +26,60 @@ export function StepIndicator() {
           Previous
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-0">
           {STEP_LABELS.map((label, idx) => {
             const step = idx + 1;
             const isActive = step === activeStep;
-            const isPast = step < activeStep;
+            const isCompleted = step < activeStep;
+
             return (
-              <button
-                key={step}
-                onClick={() => setActiveStep(step)}
-                className="flex flex-col items-center gap-1 group"
-                aria-label={`Step ${step}: ${label}`}
-              >
-                <span
-                  className={`
-                    flex items-center justify-center size-8 rounded-full text-xs font-semibold transition-colors
-                    ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : isPast
-                          ? "bg-primary/60 text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
-                    }
-                    group-hover:ring-2 group-hover:ring-primary/30
-                  `}
+              <Fragment key={step}>
+                {idx > 0 ? (
+                  <div
+                    className={cn(
+                      "mb-5 h-0.5 w-8 rounded-full",
+                      step <= activeStep ? "bg-secondary" : "bg-border"
+                    )}
+                  />
+                ) : null}
+
+                <button
+                  onClick={() => setActiveStep(step)}
+                  className="group flex min-w-[56px] flex-col items-center gap-1"
+                  aria-label={`Step ${step}: ${label}`}
                 >
-                  {step}
-                </span>
-                <span className="hidden sm:block text-[10px] text-muted-foreground leading-tight text-center">
-                  {label}
-                </span>
-              </button>
+                  <span
+                    className={cn(
+                      "flex size-8 items-center justify-center rounded-full border-2 font-heading text-xs font-semibold transition-colors",
+                      isActive &&
+                        "border-primary bg-primary text-primary-foreground",
+                      isCompleted &&
+                        "border-secondary bg-secondary text-secondary-foreground",
+                      !isActive &&
+                        !isCompleted &&
+                        "border-border bg-card text-muted-foreground"
+                    )}
+                  >
+                    {step}
+                  </span>
+                  <span
+                    className={cn(
+                      "hidden text-[0.6rem] font-medium leading-tight sm:block",
+                      isActive && "text-primary",
+                      isCompleted && "text-secondary",
+                      !isActive && !isCompleted && "text-muted-foreground"
+                    )}
+                  >
+                    {label}
+                  </span>
+                </button>
+              </Fragment>
             );
           })}
         </div>
 
         <Button
-          variant="outline"
+          variant="default"
           size="sm"
           disabled={activeStep === 5}
           onClick={() => setActiveStep(activeStep + 1)}

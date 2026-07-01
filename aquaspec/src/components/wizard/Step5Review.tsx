@@ -6,10 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileTextIcon } from "lucide-react";
 
-function fmt(num: number, decimals: number): string {
-  return num.toFixed(decimals);
-}
-
 const WATER_SOURCE_LABELS: Record<string, string> = {
   seawater: "Seawater",
   freshwater: "Freshwater",
@@ -44,6 +40,7 @@ const SYSTEM_TYPE_LABELS: Record<string, string> = {
   general: "General",
 };
 
+/** Summarizes the entered sizing inputs before proposal export. */
 export function Step5Review() {
   const hatcheryName = useStore((s) => s.hatcheryName);
   const mode = useStore((s) => s.mode);
@@ -53,14 +50,16 @@ export function Step5Review() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">{hatcheryName || "Unnamed Hatchery"}</h2>
+        <h2 className="font-heading text-xl font-semibold">
+          {hatcheryName || "Unnamed Hatchery"}
+        </h2>
         <p className="text-sm text-muted-foreground">
           Mode: {mode === "aggregate" ? "Single System" : "Multi-System"}
         </p>
       </div>
 
       {systems.map((sys, i) => (
-        <Card key={i} size="sm">
+        <Card key={i} size="sm" className="card-accent">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               {sys.name || `System ${i + 1}`}

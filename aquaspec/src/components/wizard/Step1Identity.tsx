@@ -4,9 +4,10 @@ import { useStore } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Trash2Icon, PlusIcon } from "lucide-react";
 
+/** Captures the top-level hatchery identity and operating mode. */
 export function Step1Identity() {
   const hatcheryName = useStore((s) => s.hatcheryName);
   const mode = useStore((s) => s.mode);
@@ -65,7 +66,7 @@ export function Step1Identity() {
           <Label>Systems</Label>
           <div className="space-y-2">
             {systems.map((sys, i) => (
-              <Card key={i} size="sm">
+              <Card key={i} size="sm" className="card-accent">
                 <CardContent className="flex items-center gap-2 p-3">
                   <Input
                     className="flex-1"

@@ -6,16 +6,19 @@ interface Props {
   result: UVSizingResult;
 }
 
+/** Shows the selected UV package in the same tagged card language as the prototype. */
 export function UVCard({ result }: Props) {
   return (
-    <div className="rounded-lg bg-muted/50 p-3 space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          UV
-        </span>
-        <span className="text-sm font-bold">
+    <div className="result-card space-y-2">
+      <div className="result-card-label">UV System</div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="model-tag bg-cyan-50 text-cyan-700 border-cyan-100">
           {result.selectedModel}
-          {result.parallelUnits > 1 && <> × {result.parallelUnits}</>}
+        </span>
+        <span className="result-card-value text-base">
+          {result.parallelUnits > 1
+            ? `× ${result.parallelUnits} units`
+            : "1 unit"}
         </span>
       </div>
       <p className="text-[11px] text-muted-foreground">

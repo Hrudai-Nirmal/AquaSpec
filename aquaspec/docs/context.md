@@ -94,8 +94,15 @@ A saved set of inputs and results representing one customer's water treatment si
 ---
 
 ## Technical Stack
-- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui
+- **Frontend:** Next.js 16 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui v4
 - **Validation:** Zod
+- **State:** Zustand
 - **PDF:** Playwright/Chromium (HTML → PDF)
 - **Engine:** Framework-independent pure TypeScript module
 - **Data Files:** JSON (sizing rules, static pricing text)
+
+## Visual System
+- **Brand Direction:** Lotus Ozone light-mode visual language with a cyan interactive palette, teal structural accents, and slate-50 page background.
+- **Typography:** Inter for body and controls, Geist for headings, card titles, numeric result values, and wizard section titles.
+- **Card Treatment:** Main wizard cards use a teal top accent and subtle teal-to-white gradient via the shared `.card-accent` class.
+- **Results Behavior:** The desktop results rail only appears once a recommendation exists; mobile keeps the inline results panel below the form.

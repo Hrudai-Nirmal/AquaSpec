@@ -19,6 +19,7 @@ interface SavedConfigsSidebarProps {
   onClose: () => void;
 }
 
+/** Provides quick access to saved sizing snapshots without leaving the wizard. */
 export function SavedConfigsSidebar({
   isOpen,
   onClose,
@@ -110,7 +111,7 @@ export function SavedConfigsSidebar({
       const existingConfig = configs.find((c) => c.id === activeConfigId);
       const fallbackName = hatcheryName || "Untitled";
       const name = existingConfig?.name ?? fallbackName;
-      saveConfig(name).catch((e: Error) => {
+      saveConfig(name).catch(() => {
         // If save fails (e.g., no recommendation), silently ignore
       });
     } else {
@@ -185,13 +186,17 @@ export function SavedConfigsSidebar({
       {/* Sidebar panel */}
       <div
         className={cn(
-          "fixed right-0 top-0 bottom-0 z-50 w-full lg:w-[360px] bg-background border-l shadow-lg flex flex-col transition-transform duration-200 ease-in-out",
+          "fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col border-l border-border bg-background shadow-lg transition-transform duration-200 ease-in-out lg:w-[360px]",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
+        <div className="h-[3px] shrink-0 bg-secondary" />
+
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
-          <h2 className="text-sm font-semibold">Saved Configurations</h2>
+          <h2 className="font-heading text-sm font-semibold">
+            Saved Configurations
+          </h2>
           <Button variant="ghost" size="icon-sm" onClick={onClose}>
             <XIcon className="size-4" />
           </Button>
@@ -230,7 +235,7 @@ export function SavedConfigsSidebar({
                     onClick={() => handleConfigClick(config)}
                     className={cn(
                       "w-full text-left px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:bg-muted/50",
-                      isActive && "bg-muted/50 border-l-2 border-l-primary"
+                      isActive && "border-l-2 border-l-primary bg-background"
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">

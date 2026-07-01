@@ -63,6 +63,7 @@ function StaleEditsBanner() {
   );
 }
 
+/** Presents ready-state sizing outputs in the branded result panel layout. */
 export function ResultsPanel() {
   const recommendation = useStore((s) => s.recommendation);
   const isComputing = useStore((s) => s.isComputing);
@@ -131,7 +132,7 @@ export function ResultsPanel() {
 
   return (
     <div className="w-full space-y-4">
-      <h2 className="text-lg font-semibold flex items-center gap-2">
+      <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
         Results
         {hasAggregate && (
           <span className="text-xs text-muted-foreground font-normal">
@@ -146,9 +147,9 @@ export function ResultsPanel() {
 
       {/* Per-system cards */}
       {recommendation.systems.map((sysRec, i) => (
-        <Card key={i} size="sm">
+        <Card key={i} size="sm" className="border border-border bg-card shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-foreground">
               {sysRec.systemName}
             </CardTitle>
           </CardHeader>
