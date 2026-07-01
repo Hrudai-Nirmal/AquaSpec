@@ -33,6 +33,7 @@ A saved set of inputs and results representing one customer's water treatment si
 - Engine outputs ONE design point per system. No multi-scenario spread.
 - Live recompute on any input change.
 - Client-side compute requests should fail back to a visible error state if `/api/size` does not answer promptly, rather than leaving the wizard in a permanent loading state.
+- The review step should not silently auto-retry a failed compute; retries after an error are user-driven so timeout or API failures remain visible.
 
 ---
 
@@ -111,3 +112,4 @@ A saved set of inputs and results representing one customer's water treatment si
 - **Support CTA Areas:** The form rail now continues into a “What happens next?” explainer and a direct-contact section with call and WhatsApp cards.
 - **Proposal Preview Resilience:** The proposal modal and `/proposal/preview` route share a session-backed payload so preview/PDF generation still works after route navigation and the desktop results rail can recover from async timing.
 - **Results Rail Behavior:** Desktop results remain visible during active computation and compute errors, while the lower support sections sit farther below the stepper so the first form card does not visually crowd the background break.
+- **Results Rail Behavior:** Desktop results remain visible during active computation and compute errors, but the rail ends with the form row rather than stretching alongside the lower support sections.

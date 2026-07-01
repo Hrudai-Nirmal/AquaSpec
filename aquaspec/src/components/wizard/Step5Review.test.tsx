@@ -27,6 +27,7 @@ const mockStoreState = {
   recommendation: null,
   isValid: true,
   isComputing: false,
+  computeError: null as string | null,
   triggerCompute: vi.fn(async () => {
     mockStoreState.recommendation = {
       hatcheryName: "Lotus Ozone",
@@ -87,6 +88,7 @@ afterEach(() => {
   mockStoreState.recommendation = null;
   mockStoreState.isComputing = false;
   mockStoreState.isValid = true;
+  mockStoreState.computeError = null;
   mockStoreState.triggerCompute.mockClear();
   mockStoreState.setProposalOpen.mockClear();
   if (root) {
@@ -121,5 +123,18 @@ describe("Step5Review", () => {
 
     expect(mockStoreState.triggerCompute).toHaveBeenCalled();
     expect(mockStoreState.setProposalOpen).toHaveBeenCalledWith(true);
+  });
+
+  it("does not auto-retry after a compute failure until the user explicitly retries", async () => {
+    mockStoreState.computeError = "Sizing request timed out. Please try again.";
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+
+    await act(async () => {
+      root!.render(<Step5Review />);
+    });
+
+    expect(mockStoreState.triggerCompute).not.toHaveBeenCalled();
   });
 });

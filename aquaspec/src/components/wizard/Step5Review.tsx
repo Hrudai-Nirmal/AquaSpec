@@ -49,14 +49,15 @@ export function Step5Review() {
   const recommendation = useStore((s) => s.recommendation);
   const isValid = useStore((s) => s.isValid);
   const isComputing = useStore((s) => s.isComputing);
+  const computeError = useStore((s) => s.computeError);
   const triggerCompute = useStore((s) => s.triggerCompute);
   const setProposalOpen = useStore((s) => s.setProposalOpen);
 
   useEffect(() => {
-    if (isValid && !recommendation && !isComputing) {
+    if (isValid && !recommendation && !isComputing && !computeError) {
       void triggerCompute();
     }
-  }, [isComputing, isValid, recommendation, triggerCompute]);
+  }, [computeError, isComputing, isValid, recommendation, triggerCompute]);
 
   async function handleGenerateProposal() {
     if (!recommendation && isValid && !isComputing) {

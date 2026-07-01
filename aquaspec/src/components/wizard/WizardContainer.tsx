@@ -140,6 +140,9 @@ export function WizardContainer() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const shouldShowDesktopResults =
     recommendation !== null || isComputing || computeError !== null;
+  const formShellClassName = shouldShowDesktopResults
+    ? "max-w-[1180px]"
+    : "max-w-[720px]";
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -211,72 +214,81 @@ export function WizardContainer() {
       </header>
 
       {/* Main content area */}
-      <div className="relative flex flex-1 flex-col overflow-hidden lg:flex-row min-h-0">
-        {/* Form panel (scrollable) */}
-        <div className="flex-1 overflow-y-auto px-4 pt-8 pb-16 lg:px-8 lg:pb-24">
-          <div className="mx-auto max-w-[720px]">
-            {/* Hydration guard: don't render form until state is loaded */}
-            {!isHydrated ? (
-              <Card className="card-accent">
-                <CardContent className="py-12">
-                  <div className="flex items-center justify-center">
-                    <p className="text-muted-foreground text-sm">Loading...</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Stepper
-                currentStep={activeStep}
-                initialStep={1}
-                onStepChange={setActiveStep}
-                canAdvanceFromStep={validateStep}
-                backButtonText="Previous"
-                nextButtonText="Next"
-                stepLabels={["Identity", "Water", "Hydraulics", "Disinfect", "Review"]}
-                stepCircleContainerClassName="card-accent"
-              >
-                <Step>
-                  <div className="space-y-6">
-                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
-                      {STEP_TITLES[0]}
-                    </h2>
-                    <Step1Identity />
-                  </div>
-                </Step>
-                <Step>
-                  <div className="space-y-6">
-                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
-                      {STEP_TITLES[1]}
-                    </h2>
-                    <Step2WaterProfile />
-                  </div>
-                </Step>
-                <Step>
-                  <div className="space-y-6">
-                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
-                      {STEP_TITLES[2]}
-                    </h2>
-                    <Step3Hydraulics />
-                  </div>
-                </Step>
-                <Step>
-                  <div className="space-y-6">
-                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
-                      {STEP_TITLES[3]}
-                    </h2>
-                    <Step4Disinfection />
-                  </div>
-                </Step>
-                <Step>
-                  <div className="space-y-6">
-                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
-                      {STEP_TITLES[4]}
-                    </h2>
-                    <Step5Review />
-                  </div>
-                </Step>
-              </Stepper>
-            )}
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-8 pb-16 lg:px-8 lg:pb-24">
+        <div className={`mx-auto ${formShellClassName}`}>
+          <div className="lg:flex lg:items-start lg:gap-8">
+            <div className="min-w-0 flex-1">
+              {/* Hydration guard: don't render form until state is loaded */}
+              {!isHydrated ? (
+                <Card className="card-accent">
+                  <CardContent className="py-12">
+                    <div className="flex items-center justify-center">
+                      <p className="text-muted-foreground text-sm">Loading...</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Stepper
+                  currentStep={activeStep}
+                  initialStep={1}
+                  onStepChange={setActiveStep}
+                  canAdvanceFromStep={validateStep}
+                  backButtonText="Previous"
+                  nextButtonText="Next"
+                  stepLabels={["Identity", "Water", "Hydraulics", "Disinfect", "Review"]}
+                  stepCircleContainerClassName="card-accent"
+                >
+                  <Step>
+                    <div className="space-y-6">
+                      <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                        {STEP_TITLES[0]}
+                      </h2>
+                      <Step1Identity />
+                    </div>
+                  </Step>
+                  <Step>
+                    <div className="space-y-6">
+                      <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                        {STEP_TITLES[1]}
+                      </h2>
+                      <Step2WaterProfile />
+                    </div>
+                  </Step>
+                  <Step>
+                    <div className="space-y-6">
+                      <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                        {STEP_TITLES[2]}
+                      </h2>
+                      <Step3Hydraulics />
+                    </div>
+                  </Step>
+                  <Step>
+                    <div className="space-y-6">
+                      <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                        {STEP_TITLES[3]}
+                      </h2>
+                      <Step4Disinfection />
+                    </div>
+                  </Step>
+                  <Step>
+                    <div className="space-y-6">
+                      <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                        {STEP_TITLES[4]}
+                      </h2>
+                      <Step5Review />
+                    </div>
+                  </Step>
+                </Stepper>
+              )}
+            </div>
+
+            {shouldShowDesktopResults ? (
+              <div className="hidden animate-slide-in-right lg:flex lg:w-[420px] lg:shrink-0 lg:self-start">
+                <div className="w-full rounded-[30px] border border-border/80 bg-white/96 p-6 shadow-[0_28px_80px_-56px_rgba(15,23,42,0.3)]">
+                  <ResultsPanel />
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* Mobile/Tablet: results below form */}
@@ -289,13 +301,6 @@ export function WizardContainer() {
             <ContactSection />
           </div>
         </div>
-
-        {/* Desktop: results panel side-by-side */}
-        {shouldShowDesktopResults ? (
-          <div className="hidden animate-slide-in-right border-l border-border/80 bg-white/96 p-6 lg:flex lg:w-[440px] lg:overflow-y-auto">
-            <ResultsPanel />
-          </div>
-        ) : null}
       </div>
 
       {/* Proposal preview modal */}
