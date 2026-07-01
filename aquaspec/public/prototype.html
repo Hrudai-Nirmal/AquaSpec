@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaSpec — Visual Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan-500: #06b6d4;
+    --cyan-600: #0891b2;
+    --cyan-700: #0e7490;
+    --cyan-50: #ecfeff;
+    --cyan-100: #cffafe;
+    --teal-500: #0d9488;
+    --teal-600: #0f766e;
+    --teal-700: #115e59;
+    --teal-50: #f0fdfa;
+    --teal-100: #ccfbf1;
+    --emerald-50: #ecfdf5;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    --white: #ffffff;
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--slate-50);
+    color: var(--slate-800);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, .step-title {
+    font-family: 'Geist', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* ─── Layout ─────────────────────────── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .top-accent {
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan-500), var(--teal-500));
+  }
+
+  /* ─── Header ─────────────────────────── */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--slate-200);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--cyan-500), var(--teal-500));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Geist', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .brand-text h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    line-height: 1.2;
+  }
+
+  .brand-text p {
+    font-size: 0.7rem;
+    color: var(--slate-500);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--slate-200);
+    background: var(--white);
+    color: var(--slate-700);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: var(--slate-100); border-color: var(--slate-300); }
+  .btn-icon { padding: 0.4rem; }
+  .btn svg { width: 15px; height: 15px; stroke-width: 1.75; }
+
+  /* ─── Main content ───────────────────── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .form-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: center;
+    transition: padding-right 0.3s ease;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  /* ─── Cards ──────────────────────────── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-accent {
+    border-top: 3px solid var(--teal-500);
+    background: linear-gradient(180deg, var(--teal-50) 0%, var(--white) 8px, var(--white) 100%);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem 0.5rem;
+  }
+
+  .card-header h3 {
+    font-size: 1.05rem;
+    color: var(--slate-900);
+  }
+
+  .card-body {
+    padding: 0.75rem 1.25rem 1.25rem;
+  }
+
+  /* ─── Form elements ──────────────────── */
+  .field {
+    margin-bottom: 1rem;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--slate-700);
+    margin-bottom: 0.35rem;
+  }
+
+  .field label .required {
+    color: var(--cyan-600);
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--slate-900);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+
+  .input:focus {
+    border-color: var(--cyan-500);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12);
+  }
+
+  .input::placeholder { color: var(--slate-400); }
+
+  .toggle-group {
+    display: flex;
+    gap: 0.375rem;
+  }
+
+  .toggle {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--slate-600);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .toggle.active {
+    background: var(--cyan-500);
+    color: var(--white);
+    border-color: var(--cyan-500);
+  }
+
+  /* ─── Stepper ────────────────────────── */
+  .stepper {
+    background: var(--white);
+    border-top: 1px solid var(--slate-200);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .stepper-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Geist', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid var(--slate-200);
+    background: var(--white);
+    color: var(--slate-400);
+  }
+
+  .step-circle.active {
+    border-color: var(--cyan-500);
+    background: var(--cyan-500);
+    color: var(--white);
+  }
+
+  .step-circle.done {
+    border-color: var(--teal-500);
+    background: var(--teal-500);
+    color: var(--white);
+  }
+
+  .step-label {
+    font-size: 0.6rem;
+    color: var(--slate-400);
+    font-weight: 500;
+  }
+
+  .step-label.active { color: var(--cyan-600); }
+  .step-label.done { color: var(--teal-600); }
+
+  .step-track {
+    width: 32px;
+    height: 2px;
+    background: var(--slate-200);
+    margin: 0 4px;
+    margin-bottom: 14px;
+  }
+
+  .step-track.done { background: var(--teal-500); }
+
+  .nav-btn {
+    padding: 0.45rem 1rem;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--slate-700);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.15s;
+  }
+
+  .nav-btn:hover { background: var(--slate-100); }
+  .nav-btn.primary {
+    background: var(--cyan-500);
+    color: var(--white);
+    border-color: var(--cyan-500);
+    font-weight: 600;
+  }
+  .nav-btn.primary:hover { background: var(--cyan-600); }
+  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ─── Results panel (slide-in) ──────── */
+  .results-panel {
+    width: 420px;
+    background: var(--white);
+    border-left: 1px solid var(--slate-200);
+    overflow-y: auto;
+    padding: 1.25rem;
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .results-panel.hidden {
+    transform: translateX(100%);
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  .results-placeholder {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--slate-400);
+  }
+
+  .results-placeholder svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.75rem;
+    opacity: 0.3;
+  }
+
+  .result-card {
+    background: var(--white);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius);
+    padding: 0.875rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .result-card .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-500);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .result-card .value {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--slate-900);
+  }
+
+  .result-card .unit {
+    font-size: 0.75rem;
+    color: var(--slate-500);
+    font-weight: 400;
+    margin-left: 0.25rem;
+  }
+
+  .result-card .model-tag {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--cyan-50);
+    color: var(--cyan-700);
+    border: 1px solid var(--cyan-100);
+    border-radius: 4px;
+  }
+
+  /* ─── Responsive ─────────────────────── */
+  @media (max-width: 1024px) {
+    .results-panel { width: 100%; position: fixed; z-index: 30; right: 0; }
+    .results-panel.hidden { transform: translateX(100%); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-accent"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="logo">L</div>
+      <div class="brand-text">
+        <h1>AquaSpec</h1>
+        <p>Lotus Ozone Water Treatment Sizing Wizard</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>
+        Saved
+      </button>
+      <button class="btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        New
+      </button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <div class="main" style="position:relative;">
+    <!-- Form -->
+    <div class="form-area">
+      <div class="form-container">
+        <!-- Step title -->
+        <h2 style="font-size:1.25rem; color:var(--slate-900); margin-bottom:1rem;">Hatchery Identity</h2>
+
+        <!-- Card -->
+        <div class="card-accent">
+          <div class="card-body">
+            <div class="field">
+              <label>Hatchery Name <span class="required">*</span></label>
+              <input class="input" placeholder="e.g. Coastal Shrimp Hatchery" value="Coastal Shrimp Hatchery">
+            </div>
+            <div class="field">
+              <label>Mode</label>
+              <div class="toggle-group">
+                <button class="toggle active">Single System</button>
+                <button class="toggle">Multi-System</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Panel (visible with demo data) -->
+    <div class="results-panel">
+      <h3 style="font-family:Geist,sans-serif; font-size:1rem; margin-bottom:0.75rem; color:var(--slate-900)">Results</h3>
+      
+      <div class="result-card">
+        <div class="label">Flow Rate</div>
+        <div class="value">250 <span class="unit">m³/hr</span></div>
+      </div>
+      
+      <div class="result-card">
+        <div class="label">Ozone Generator</div>
+        <div class="value" style="font-size:1rem; display:flex; align-items:center; gap:0.5rem;">
+          <span class="model-tag">LT-G-4</span>
+          <span style="font-size:0.85rem">375 g/hr</span>
+        </div>
+      </div>
+      
+      <div class="result-card">
+        <div class="label">UV System</div>
+        <div class="value" style="font-size:1rem;">
+          <span class="model-tag">LTU-T-100</span>
+          <span style="font-size:0.85rem; margin-left:0.5rem;">× 2 units</span>
+        </div>
+      </div>
+      
+      <div class="result-card">
+        <div class="label">Oxygen Package</div>
+        <div class="value" style="font-size:1rem;">
+          <span class="model-tag">LTX-10</span>
+          <span style="font-size:0.85rem; margin-left:0.5rem;">8 m³/hr total</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <button class="nav-btn" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Previous
+    </button>
+
+    <div class="stepper-steps">
+      <div class="step-dot">
+        <div class="step-circle active">1</div>
+        <div class="step-label active">Identity</div>
+      </div>
+      <div class="step-track"></div>
+      <div class="step-dot">
+        <div class="step-circle">2</div>
+        <div class="step-label">Water</div>
+      </div>
+      <div class="step-track"></div>
+      <div class="step-dot">
+        <div class="step-circle">3</div>
+        <div class="step-label">Hydraulics</div>
+      </div>
+      <div class="step-track"></div>
+      <div class="step-dot">
+        <div class="step-circle">4</div>
+        <div class="step-label">Disinfect</div>
+      </div>
+      <div class="step-track"></div>
+      <div class="step-dot">
+        <div class="step-circle">5</div>
+        <div class="step-label">Review</div>
+      </div>
+    </div>
+
+    <button class="nav-btn primary">
+      Next
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+</body>
+</html>
