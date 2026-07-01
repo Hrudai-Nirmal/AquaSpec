@@ -1,8 +1,16 @@
+/**
+ * Proposal payload helpers keep preview/PDF requests aligned with the current
+ * wizard state and with the session fallback used by the preview route.
+ */
+
 import type { SystemInputDisplay } from "./proposal-html";
 import type { ProposalSessionPayload } from "./proposal-session";
 import type { HatcheryRecommendation } from "./sizing-engine/types";
 import type { SystemData } from "./store";
 
+/**
+ * Normalizes draft system values into the numeric payload expected by proposal rendering.
+ */
 export function buildProposalInputs(
   systems: SystemData[]
 ): SystemInputDisplay[] {
@@ -20,6 +28,9 @@ export function buildProposalInputs(
   }));
 }
 
+/**
+ * Builds the complete proposal payload shared by the modal preview and the full preview page.
+ */
 export function buildProposalSessionPayload(args: {
   hatcheryName: string;
   includeBudgetary: boolean;

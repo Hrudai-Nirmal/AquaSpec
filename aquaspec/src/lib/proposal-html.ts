@@ -7,7 +7,7 @@
 
 import fs from "fs";
 import path from "path";
-import type { HatcheryRecommendation, SystemRecommendation } from "./sizing-engine/types";
+import type { HatcheryRecommendation } from "./sizing-engine/types";
 
 // ─── Label helpers ──────────────────────────────────────────────────────────
 

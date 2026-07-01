@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,10 @@ import {
   saveProposalSession,
   type ProposalSessionPayload,
 } from "@/lib/proposal-session";
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unexpected error";
+}
 
 export default function ProposalPreviewPage() {
   const router = useRouter();
@@ -23,36 +27,44 @@ export default function ProposalPreviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
-  const [proposalPayload, setProposalPayload] =
-    useState<ProposalSessionPayload | null>(null);
-  const [proposalChecked, setProposalChecked] = useState(Boolean(recommendation));
-
-  useEffect(() => {
+  const proposalPayload = useMemo<ProposalSessionPayload | null>(() => {
     if (recommendation) {
-      const nextPayload = buildProposalSessionPayload({
+      return buildProposalSessionPayload({
         hatcheryName,
         includeBudgetary: budgetaryEstimateEnabled,
         recommendation,
         systems,
       });
-      saveProposalSession(nextPayload);
-      setProposalPayload(nextPayload);
-      setProposalChecked(true);
-      return;
     }
 
-    setProposalPayload(loadProposalSession());
-    setProposalChecked(true);
+    return loadProposalSession();
   }, [budgetaryEstimateEnabled, hatcheryName, recommendation, systems]);
 
   useEffect(() => {
-    if (!proposalPayload) {
-      setLoading(false);
-      return;
+    if (recommendation && proposalPayload) {
+      saveProposalSession(proposalPayload);
     }
+  }, [proposalPayload, recommendation]);
+
+  useEffect(() => {
+    let isActive = true;
 
     const fetchHtml = async () => {
+      if (!proposalPayload) {
+        if (isActive) {
+          setHtml(null);
+          setError(null);
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
+        if (isActive) {
+          setLoading(true);
+          setError(null);
+        }
+
         const response = await fetch("/api/proposal/preview", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -69,15 +81,25 @@ export default function ProposalPreviewPage() {
         }
 
         const htmlText = await response.text();
-        setHtml(htmlText);
-      } catch (e: any) {
-        setError(e.message || "Failed to load preview");
+        if (isActive) {
+          setHtml(htmlText);
+        }
+      } catch (error: unknown) {
+        if (isActive) {
+          setError(getErrorMessage(error) || "Failed to load preview");
+        }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchHtml();
+    void fetchHtml();
+
+    return () => {
+      isActive = false;
+    };
   }, [proposalPayload]);
 
   const handleDownload = useCallback(async () => {
@@ -105,29 +127,17 @@ export default function ProposalPreviewPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `LotusOzone_Proposal_${hatcheryName.replace(/[^a-zA-Z0-9_-]/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`;
+      a.download = `LotusOzone_Proposal_${proposalPayload.hatcheryName.replace(/[^a-zA-Z0-9_-]/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      alert(e.message || "Failed to download PDF");
+    } catch (error: unknown) {
+      alert(getErrorMessage(error) || "Failed to download PDF");
     } finally {
       setDownloading(false);
     }
-  }, [downloading, hatcheryName, proposalPayload]);
-
-  // No recommendation state
-  if (!proposalChecked) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-4">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Preparing proposal...</p>
-        </div>
-      </div>
-    );
-  }
+  }, [downloading, proposalPayload]);
 
   if (!proposalPayload) {
     return (

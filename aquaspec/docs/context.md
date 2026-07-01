@@ -102,9 +102,10 @@ A saved set of inputs and results representing one customer's water treatment si
 - **Data Files:** JSON (sizing rules, static pricing text)
 
 ## Visual System
-- **Brand Direction:** Lotus Ozone light-mode visual language uses a white page canvas with `#007979`, `#24B1B1`, and `#6FD1D7` accents, plus the real `public/LotusOzoneLogo.png` in the enlarged header.
+- **Brand Direction:** Lotus Ozone light-mode visual language uses a white page canvas with turquoise-led accents derived from `#08B8C7`, `#59DBE3`, and `#AEF2F5`, plus the real `public/LotusOzoneLogo.png` in the enlarged header.
 - **Typography:** Inter drives body copy and step numbers, while heading moments use the branded display stack already wired through `--font-heading`.
-- **Card Treatment:** Main wizard cards and support sections use soft white surfaces, clean teal borders, and restrained drop shadows instead of the earlier warm beige shell.
-- **Field Styling:** Inputs and selects keep colored borders, larger hit areas, and glassy white fills without inline red error copy, while steps 2-4 include compact info icons for field guidance.
+- **Card Treatment:** Main wizard cards and support sections use soft white surfaces, clean turquoise borders, and restrained drop shadows instead of the earlier warm beige shell.
+- **Field Styling:** Inputs and selects keep colored borders, larger hit areas, and glassy white fills without inline red error copy, while steps 2-4 include compact hover/focus field guidance and step one combines the country prefix selector directly into the phone field.
 - **Navigation Feedback:** The main wizard card now uses a combined ReactBits-style stepper shell that advances between sections while marking incomplete ones red and completed ones green.
 - **Support CTA Areas:** The form rail now continues into a “What happens next?” explainer and a direct-contact section with call and WhatsApp cards.
+- **Proposal Preview Resilience:** The proposal modal and `/proposal/preview` route share a session-backed payload so preview/PDF generation still works after route navigation and the desktop results rail can recover from async timing.

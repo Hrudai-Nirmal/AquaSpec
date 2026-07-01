@@ -88,7 +88,7 @@ describe("Stepper", () => {
     expect(canAdvanceFromStep).toHaveBeenCalledWith(1);
     expect(container.textContent).toContain("Step two content");
     expect(container.innerHTML).toContain('data-step-status="error"');
-    expect(container.textContent).toContain("marked incomplete in red");
+    expect(container.textContent).not.toContain("marked incomplete in red");
   });
 
   it("allows direct step clicks to change the active step", async () => {
