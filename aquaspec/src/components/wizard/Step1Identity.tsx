@@ -80,7 +80,9 @@ export function Step1Identity() {
             <Label>Country Prefix *</Label>
             <Select
               value={phoneCountryCode}
-              onValueChange={(value) => updateField("phoneCountryCode", value)}
+              onValueChange={(value) => {
+                if (value) updateField("phoneCountryCode", value);
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="+91" />
