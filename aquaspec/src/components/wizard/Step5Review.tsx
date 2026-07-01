@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,27 @@ export function Step5Review() {
   const hatcheryName = useStore((s) => s.hatcheryName);
   const mode = useStore((s) => s.mode);
   const systems = useStore((s) => s.systems);
+  const recommendation = useStore((s) => s.recommendation);
+  const isValid = useStore((s) => s.isValid);
+  const isComputing = useStore((s) => s.isComputing);
+  const triggerCompute = useStore((s) => s.triggerCompute);
   const setProposalOpen = useStore((s) => s.setProposalOpen);
+
+  useEffect(() => {
+    if (isValid && !recommendation && !isComputing) {
+      void triggerCompute();
+    }
+  }, [isComputing, isValid, recommendation, triggerCompute]);
+
+  async function handleGenerateProposal() {
+    if (!recommendation && isValid && !isComputing) {
+      await triggerCompute();
+    }
+
+    if (useStore.getState().recommendation) {
+      setProposalOpen(true);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -118,12 +139,15 @@ export function Step5Review() {
       ))}
 
       <Button
-        onClick={() => setProposalOpen(true)}
+        onClick={() => {
+          void handleGenerateProposal();
+        }}
         className="w-full"
         size="lg"
+        disabled={!isValid || isComputing}
       >
         <FileTextIcon className="size-4 mr-2" />
-        Generate Proposal
+        {isComputing ? "Calculating Recommendations..." : "Generate Proposal"}
       </Button>
     </div>
   );

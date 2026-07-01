@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { FileDownIcon, ArrowLeftIcon } from "lucide-react";
+import { buildProposalSessionPayload } from "@/lib/proposal-payload";
+import {
+  loadProposalSession,
+  saveProposalSession,
+  type ProposalSessionPayload,
+} from "@/lib/proposal-session";
 
 export default function ProposalPreviewPage() {
   const router = useRouter();
@@ -12,15 +18,35 @@ export default function ProposalPreviewPage() {
   const budgetaryEstimateEnabled = useStore((s) => s.budgetaryEstimateEnabled);
   const systems = useStore((s) => s.systems);
   const hatcheryName = useStore((s) => s.hatcheryName);
-  const mode = useStore((s) => s.mode);
 
   const [html, setHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [proposalPayload, setProposalPayload] =
+    useState<ProposalSessionPayload | null>(null);
+  const [proposalChecked, setProposalChecked] = useState(Boolean(recommendation));
 
   useEffect(() => {
-    if (!recommendation) {
+    if (recommendation) {
+      const nextPayload = buildProposalSessionPayload({
+        hatcheryName,
+        includeBudgetary: budgetaryEstimateEnabled,
+        recommendation,
+        systems,
+      });
+      saveProposalSession(nextPayload);
+      setProposalPayload(nextPayload);
+      setProposalChecked(true);
+      return;
+    }
+
+    setProposalPayload(loadProposalSession());
+    setProposalChecked(true);
+  }, [budgetaryEstimateEnabled, hatcheryName, recommendation, systems]);
+
+  useEffect(() => {
+    if (!proposalPayload) {
       setLoading(false);
       return;
     }
@@ -31,20 +57,9 @@ export default function ProposalPreviewPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            recommendation,
-            includeBudgetary: budgetaryEstimateEnabled,
-            inputs: systems.map((sys) => ({
-              name: sys.name,
-              waterSource: sys.waterSource,
-              qualityBand: sys.qualityBand,
-              salinityPpt: parseFloat(sys.salinityPpt) || 0,
-              totalVolumeM3: parseFloat(sys.totalVolumeM3) || 0,
-              turnoversPerDay: parseInt(sys.turnoversPerDay, 10) || 0,
-              operatingHoursPerDay: parseFloat(sys.operatingHoursPerDay) || 0,
-              targetPathogen: sys.targetPathogen,
-              species: sys.species,
-              systemType: sys.systemType,
-            })),
+            recommendation: proposalPayload.recommendation,
+            includeBudgetary: proposalPayload.includeBudgetary,
+            inputs: proposalPayload.inputs,
           }),
         });
 
@@ -63,10 +78,10 @@ export default function ProposalPreviewPage() {
     };
 
     fetchHtml();
-  }, [recommendation, budgetaryEstimateEnabled, systems]);
+  }, [proposalPayload]);
 
   const handleDownload = useCallback(async () => {
-    if (!recommendation || downloading) return;
+    if (!proposalPayload || downloading) return;
 
     setDownloading(true);
 
@@ -75,20 +90,9 @@ export default function ProposalPreviewPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          recommendation,
-          includeBudgetary: budgetaryEstimateEnabled,
-          inputs: systems.map((sys) => ({
-            name: sys.name,
-            waterSource: sys.waterSource,
-            qualityBand: sys.qualityBand,
-            salinityPpt: parseFloat(sys.salinityPpt) || 0,
-            totalVolumeM3: parseFloat(sys.totalVolumeM3) || 0,
-            turnoversPerDay: parseInt(sys.turnoversPerDay, 10) || 0,
-            operatingHoursPerDay: parseFloat(sys.operatingHoursPerDay) || 0,
-            targetPathogen: sys.targetPathogen,
-            species: sys.species,
-            systemType: sys.systemType,
-          })),
+          recommendation: proposalPayload.recommendation,
+          includeBudgetary: proposalPayload.includeBudgetary,
+          inputs: proposalPayload.inputs,
         }),
       });
 
@@ -111,10 +115,21 @@ export default function ProposalPreviewPage() {
     } finally {
       setDownloading(false);
     }
-  }, [recommendation, budgetaryEstimateEnabled, systems, hatcheryName, downloading]);
+  }, [downloading, hatcheryName, proposalPayload]);
 
   // No recommendation state
-  if (!recommendation) {
+  if (!proposalChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-4">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-muted-foreground">Preparing proposal...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!proposalPayload) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4 max-w-md mx-auto p-8">
@@ -136,7 +151,7 @@ export default function ProposalPreviewPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4">
-          <div className="animate-spin h-8 w-8 border-4 border-[#1F5DE1] border-t-transparent rounded-full mx-auto" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="text-muted-foreground">Preparing proposal...</p>
         </div>
       </div>
@@ -174,7 +189,7 @@ export default function ProposalPreviewPage() {
           <Button
             onClick={handleDownload}
             disabled={downloading}
-            className="bg-[#1F5DE1] hover:bg-[#1a4fc7] text-white"
+            className="bg-primary text-primary-foreground hover:bg-primary/85"
           >
             <FileDownIcon className="size-4 mr-2" />
             {downloading ? "Generating..." : "Download PDF"}

@@ -31,7 +31,7 @@ vi.mock("@/lib/store", () => ({
 }));
 
 describe("Step1Identity", () => {
-  it("renders the new contact-first fields without inline red error copy", () => {
+  it("renders the combined phone field with the selected prefix in the placeholder", () => {
     const markup = renderToStaticMarkup(<Step1Identity />);
 
     expect(markup).toContain("Full Name");
@@ -40,6 +40,8 @@ describe("Step1Identity", () => {
     expect(markup).toContain("Company Name");
     expect(markup).toContain("Location");
     expect(markup).toContain("+91");
+    expect(markup).toContain('placeholder="+91 xxxxx xxxxx"');
+    expect(markup).not.toContain("Country Prefix");
     expect(markup).not.toContain("Full name is required");
     expect(markup).not.toContain("Email address is required");
     expect(markup).not.toContain("Phone number is required");

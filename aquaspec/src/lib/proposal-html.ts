@@ -243,7 +243,7 @@ export function renderProposalHtml(
   });
 
   const tokens: Record<string, string> = {
-    PRIMARY_COLOR: "#1F5DE1",
+    PRIMARY_COLOR: "#08B8C7",
     LOGO_URL: logoUrl,
     HATCHERY_NAME: recommendation.hatcheryName,
     DATE: date,

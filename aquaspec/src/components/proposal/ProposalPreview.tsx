@@ -11,13 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FileDownIcon, XIcon } from "lucide-react";
+import { buildProposalSessionPayload } from "@/lib/proposal-payload";
+import { saveProposalSession } from "@/lib/proposal-session";
 
 export function ProposalPreview() {
   const router = useRouter();
   const proposalOpen = useStore((s) => s.proposalOpen);
   const setProposalOpen = useStore((s) => s.setProposalOpen);
   const hatcheryName = useStore((s) => s.hatcheryName);
-  const mode = useStore((s) => s.mode);
   const systems = useStore((s) => s.systems);
   const recommendation = useStore((s) => s.recommendation);
   const budgetaryEstimateEnabled = useStore((s) => s.budgetaryEstimateEnabled);
@@ -30,22 +31,33 @@ export function ProposalPreview() {
   });
 
   const handleDownload = () => {
+    if (recommendation) {
+      saveProposalSession(
+        buildProposalSessionPayload({
+          hatcheryName,
+          includeBudgetary: budgetaryEstimateEnabled,
+          recommendation,
+          systems,
+        })
+      );
+    }
+
     setProposalOpen(false);
     router.push("/proposal/preview");
   };
 
   return (
     <Dialog open={proposalOpen} onOpenChange={setProposalOpen}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto p-8 text-base md:p-10">
         <DialogHeader>
           <DialogTitle className="sr-only">Proposal Preview</DialogTitle>
         </DialogHeader>
 
         {/* Header */}
         <div className="text-center space-y-2 pb-6 border-b">
-          <h2 className="text-xl font-bold tracking-tight">LOTUS OZONE</h2>
-          <p className="text-sm text-muted-foreground">AquaSpec Proposal</p>
-          <div className="text-xs text-muted-foreground space-y-0.5">
+          <h2 className="text-3xl font-bold tracking-tight">LOTUS OZONE</h2>
+          <p className="text-base text-muted-foreground">AquaSpec Proposal</p>
+          <div className="space-y-1 text-sm text-muted-foreground">
             <p>
               <strong>Hatchery:</strong> {hatcheryName || "Unnamed"}
             </p>
@@ -54,15 +66,15 @@ export function ProposalPreview() {
         </div>
 
         {/* Body — System Summaries */}
-        <div className="space-y-6 py-6">
+        <div className="space-y-8 py-8">
           {systems.map((sys, i) => {
             const sysRec = recommendation?.systems[i];
             return (
               <div key={i} className="space-y-2">
-                <h3 className="text-sm font-semibold border-b pb-1">
+                <h3 className="border-b pb-2 text-lg font-semibold">
                   {sys.name || `System ${i + 1}`}
                 </h3>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                   <div>
                     <span className="text-muted-foreground">Water Source:</span>{" "}
                     {sys.waterSource}
@@ -89,7 +101,7 @@ export function ProposalPreview() {
                   </div>
                   {sysRec && (
                     <>
-                      <div className="col-span-2 mt-1 pt-1 border-t text-xs font-medium">
+                      <div className="col-span-2 mt-2 border-t pt-2 text-sm font-medium">
                         Engineering Results
                       </div>
                       <div>
@@ -174,7 +186,7 @@ export function ProposalPreview() {
                 type="checkbox"
                 checked={budgetaryEstimateEnabled}
                 onChange={toggleBudgetaryEstimate}
-                className="size-4 rounded border-gray-300 text-[#1F5DE1] focus:ring-[#1F5DE1]"
+                className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
               Include Budgetary Estimate
             </label>

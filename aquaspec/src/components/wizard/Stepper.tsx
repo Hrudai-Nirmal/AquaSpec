@@ -88,7 +88,6 @@ export default function Stepper({
     Partial<Record<number, StepFeedbackStatus>>
   >({});
   const [animatedStep, setAnimatedStep] = useState<number | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const totalSteps = stepPanels.length;
   const resolvedCurrentStep = currentStep ?? internalStep;
   const isLastStep = resolvedCurrentStep === totalSteps;
@@ -114,27 +113,12 @@ export default function Stepper({
   }
 
   function updateIntermediateStepStatuses(targetStep: number) {
-    if (!canAdvanceFromStep || targetStep <= resolvedCurrentStep) {
-      setStatusMessage(null);
-      return;
-    }
-
-    let encounteredInvalidStep = false;
+    if (!canAdvanceFromStep || targetStep <= resolvedCurrentStep) return;
 
     for (let step = resolvedCurrentStep; step < targetStep; step += 1) {
       const isStepValid = canAdvanceFromStep(step);
       triggerStepFeedback(step, isStepValid ? "success" : "error");
-
-      if (!isStepValid) {
-        encounteredInvalidStep = true;
-      }
     }
-
-    setStatusMessage(
-      encounteredInvalidStep
-        ? "This section is marked incomplete in red. You can keep moving and return to finish it."
-        : null
-    );
   }
 
   function handleStepChange(targetStep: number) {
@@ -149,12 +133,8 @@ export default function Stepper({
   function handleComplete() {
     if (canAdvanceFromStep && !canAdvanceFromStep(resolvedCurrentStep)) {
       triggerStepFeedback(resolvedCurrentStep, "error");
-      setStatusMessage(
-        "This section is marked incomplete in red. You can keep moving and return to finish it."
-      );
     } else {
       triggerStepFeedback(resolvedCurrentStep, "success");
-      setStatusMessage(null);
     }
     onFinalStepCompleted?.();
   }
@@ -222,7 +202,7 @@ export default function Stepper({
                       className={cn(
                         "flex size-10 items-center justify-center rounded-full border text-sm font-sans font-bold transition-all duration-300",
                         status === "active" &&
-                          "border-primary bg-primary text-primary-foreground shadow-[0_12px_30px_-18px_rgba(0,121,121,0.75)]",
+                          "border-primary bg-primary text-primary-foreground shadow-[0_12px_30px_-18px_rgba(8,184,199,0.7)]",
                         status === "complete" &&
                           "border-emerald-500 bg-emerald-500 text-white shadow-[0_12px_28px_-18px_rgba(34,197,94,0.55)]",
                         status === "error" &&
@@ -288,9 +268,6 @@ export default function Stepper({
             footerClassName
           )}
         >
-          {statusMessage ? (
-            <p className="mb-3 text-sm text-red-500">{statusMessage}</p>
-          ) : null}
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="outline"

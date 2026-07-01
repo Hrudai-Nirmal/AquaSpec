@@ -16,7 +16,7 @@ export function AggregateSummary({ summary }: Props) {
   return (
     <Card
       size="sm"
-      className="border border-border bg-[color-mix(in_oklch,var(--teal-50),white_60%)] shadow-sm"
+      className="border border-border bg-[color-mix(in_oklch,var(--teal-50),white_62%)] shadow-sm"
     >
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-semibold text-foreground">

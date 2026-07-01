@@ -106,7 +106,7 @@ function ContactSection() {
         </article>
 
         <article className="rounded-[28px] border border-border/75 bg-white p-7 text-center shadow-[0_24px_60px_-44px_rgba(15,23,42,0.28)]">
-          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-secondary/18 text-primary">
             <MessageCircleIcon className="size-7" />
           </div>
           <h4 className="mt-5 font-sans text-2xl font-semibold text-foreground">
@@ -174,9 +174,9 @@ export function WizardContainer() {
               </a>
               <a
                 href="https://wa.me/919740747096"
-                className="inline-flex items-center gap-2 rounded-full border border-border/75 bg-white px-4 py-2 text-sm font-medium text-foreground shadow-[0_10px_30px_-24px_rgba(15,23,42,0.24)] transition-colors hover:bg-emerald-50"
+                className="inline-flex items-center gap-2 rounded-full border border-border/75 bg-white px-4 py-2 text-sm font-medium text-foreground shadow-[0_10px_30px_-24px_rgba(15,23,42,0.24)] transition-colors hover:bg-secondary/12"
               >
-                <MessageCircleIcon className="size-4 text-emerald-600" />
+                <MessageCircleIcon className="size-4 text-primary" />
                 WhatsApp
               </a>
             </div>

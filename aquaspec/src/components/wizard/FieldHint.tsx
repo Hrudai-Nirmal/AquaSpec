@@ -29,14 +29,19 @@ export function FieldHint({
       <Label htmlFor={htmlFor} className="text-base text-foreground/90">
         {children}
       </Label>
-      <button
-        type="button"
-        aria-label={hint}
-        title={hint}
-        className="inline-flex size-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
-      >
-        <CircleHelpIcon className="size-3.5" />
-      </button>
+      <span className="group/fieldhint relative inline-flex">
+        <button
+          type="button"
+          aria-label={hint}
+          title={hint}
+          className="inline-flex size-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary focus-visible:text-primary"
+        >
+          <CircleHelpIcon className="size-3.5" />
+        </button>
+        <span className="pointer-events-none absolute bottom-[calc(100%+0.55rem)] left-1/2 z-20 w-56 -translate-x-1/2 rounded-xl border border-border/70 bg-white px-3 py-2 text-xs font-medium leading-relaxed text-foreground opacity-0 shadow-[0_18px_40px_-24px_rgba(15,23,42,0.26)] transition-all duration-200 group-hover/fieldhint:opacity-100 group-focus-within/fieldhint:opacity-100">
+          {hint}
+        </span>
+      </span>
     </div>
   );
 }

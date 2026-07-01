@@ -82,50 +82,44 @@ export function Step1Identity() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-[190px_1fr]">
-          <div className="space-y-3">
-            <Label className="text-base text-foreground/90">
-              Country Prefix *
-            </Label>
-            <Select
-              value={phoneCountryCode}
-              onValueChange={(value) => {
-                if (value) updateField("phoneCountryCode", value);
-              }}
-            >
-              <SelectTrigger
-                aria-invalid={Boolean(fieldErrors["phoneCountryCode"])}
-                className="bg-white/90"
-              >
-                <SelectValue placeholder="+91" />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRY_PREFIXES.map((prefix) => (
-                  <SelectItem key={prefix} value={prefix}>
-                    {prefix}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
+        <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-3">
             <Label htmlFor="phoneNumber" className="text-base text-foreground/90">
               Phone Number *
             </Label>
-            <Input
-              id="phoneNumber"
-              inputMode="tel"
-              placeholder="+91 xxxxx xxxxx"
-              value={phoneNumber}
-              onChange={(e) => updateField("phoneNumber", e.target.value)}
-              aria-invalid={Boolean(fieldErrors["phoneNumber"])}
-              className="bg-white/90"
-            />
+            <div className="flex overflow-hidden rounded-xl border border-primary/55 bg-white/90 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.55)]">
+              <Select
+                value={phoneCountryCode}
+                onValueChange={(value) => {
+                  if (value) updateField("phoneCountryCode", value);
+                }}
+              >
+                <SelectTrigger
+                  aria-invalid={Boolean(fieldErrors["phoneCountryCode"])}
+                  className="w-[110px] rounded-none border-0 border-r border-primary/20 bg-transparent pr-2 pl-3 shadow-none focus-visible:ring-0"
+                >
+                  <SelectValue placeholder="+91" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRY_PREFIXES.map((prefix) => (
+                    <SelectItem key={prefix} value={prefix}>
+                      {prefix}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                id="phoneNumber"
+                inputMode="tel"
+                placeholder={`${phoneCountryCode} xxxxx xxxxx`}
+                value={phoneNumber}
+                onChange={(e) => updateField("phoneNumber", e.target.value)}
+                aria-invalid={Boolean(fieldErrors["phoneNumber"])}
+                className="rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-3">
             <Label htmlFor="hatcheryName" className="text-base text-foreground/90">
               Company Name *
@@ -140,19 +134,20 @@ export function Step1Identity() {
             />
           </div>
 
-          <div className="space-y-3">
-            <Label htmlFor="location" className="text-base text-foreground/90">
-              Location *
-            </Label>
-            <Input
-              id="location"
-              placeholder="City, State, Country"
-              value={location}
-              onChange={(e) => updateField("location", e.target.value)}
-              aria-invalid={Boolean(fieldErrors["location"])}
-              className="bg-white/90"
-            />
-          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label htmlFor="location" className="text-base text-foreground/90">
+            Location *
+          </Label>
+          <Input
+            id="location"
+            placeholder="City, State, Country"
+            value={location}
+            onChange={(e) => updateField("location", e.target.value)}
+            aria-invalid={Boolean(fieldErrors["location"])}
+            className="bg-white/90"
+          />
         </div>
       </div>
 
