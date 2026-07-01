@@ -32,6 +32,7 @@ A saved set of inputs and results representing one customer's water treatment si
 - Engine does NOT compute pricing, margins, or commercial logic.
 - Engine outputs ONE design point per system. No multi-scenario spread.
 - Live recompute on any input change.
+- Oversized ozone demand now falls back to parallel largest-generator sizing instead of throwing once it passes the single-unit maximum, and oxygen feed scales with that parallel count.
 - Client-side compute requests should fail back to a visible error state if `/api/size` does not answer promptly, rather than leaving the wizard in a permanent loading state.
 - The review step should not silently auto-retry a failed compute; retries after an error are user-driven so timeout or API failures remain visible.
 

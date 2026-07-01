@@ -131,13 +131,21 @@ export function computeOzoneDemand(
     (m) => ozoneDemandGHr >= m.minCapacityGHr && ozoneDemandGHr <= m.maxCapacityGHr,
   );
 
-  if (!match) {
-    const largest = sortedGenerators[sortedGenerators.length - 1];
-    throw new EngineError(
-      `Ozone demand ${ozoneDemandGHr.toFixed(2)} g/hr exceeds capacity of the largest ozone generator ` +
-        `(${largest.model}, max ${largest.maxCapacityGHr} g/hr)`,
-    );
+  if (match) {
+    return {
+      result: {
+        ozoneDemandGHr,
+        doseRateGM3,
+        conditionMultiplier,
+        flowRateM3Hr,
+      },
+      ozoneGeneratorModel: match.model,
+      oxygenFeedLPM: match.oxygenFeedLPM,
+    };
   }
+
+  const largest = sortedGenerators[sortedGenerators.length - 1];
+  const parallelUnits = Math.ceil(ozoneDemandGHr / largest.maxCapacityGHr);
 
   return {
     result: {
@@ -146,8 +154,8 @@ export function computeOzoneDemand(
       conditionMultiplier,
       flowRateM3Hr,
     },
-    ozoneGeneratorModel: match.model,
-    oxygenFeedLPM: match.oxygenFeedLPM,
+    ozoneGeneratorModel: `${largest.model} ×${parallelUnits}`,
+    oxygenFeedLPM: largest.oxygenFeedLPM * parallelUnits,
   };
 }
 

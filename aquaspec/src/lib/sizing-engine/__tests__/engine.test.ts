@@ -318,14 +318,13 @@ describe("Test 7: Error — missing dose rate combo", () => {
 
 // ─── Test 8 ────────────────────────────────────────────────────────────────
 
-describe("Test 8: Error — ozone demand exceeds all models", () => {
-  it("throws EngineError when ozone demand is beyond the largest generator", () => {
-    // High volume makes ozoneDemand = 500 × 0.8 × 1.0 = 400 g/hr > 80 (max)
+describe("Test 8: Ozone parallel — demand 120 g/hr → 2×LT-G-80", () => {
+  it("uses parallel largest ozone generators when demand exceeds a single-unit maximum", () => {
     const input = aggregate(
       makeSystem({
-        waterSource: "freshwater",
+        waterSource: "seawater",
         qualityBand: "good",
-        totalVolumeM3: 1000,
+        totalVolumeM3: 240,
         turnoversPerDay: 4,
         operatingHoursPerDay: 8,
         salinityPpt: 10,
@@ -335,10 +334,15 @@ describe("Test 8: Error — ozone demand exceeds all models", () => {
       }),
     );
 
-    expect(() => sizeHatchery(input, sizingRules)).toThrow(EngineError);
-    expect(() => sizeHatchery(input, sizingRules)).toThrow(
-      /exceeds capacity of the largest ozone generator/,
-    );
+    const result = sizeHatchery(input, sizingRules);
+    const rec = result.systems[0];
+
+    expect(rec.flowRate.flowRateM3Hr).toBe(120);
+    expect(rec.ozoneDemand.ozoneDemandGHr).toBe(120);
+    expect(rec.ozoneGeneratorModel).toBe("LT-G-80 ×2");
+    expect(rec.oxygenDemand.ozoneFeedRequirementM3Hr).toBeCloseTo(5.4, 6);
+    expect(rec.oxygenDemand.totalOxygenDemandM3Hr).toBeCloseTo(5.9, 6);
+    expect(rec.oxygenDemand.selectedModel).toBe("LTX-10");
   });
 });
 
