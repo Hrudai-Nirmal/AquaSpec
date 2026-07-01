@@ -54,10 +54,6 @@ vi.mock("@/lib/store", () => ({
     selector(mockStoreState),
 }));
 
-vi.mock("./StepIndicator", () => ({
-  StepIndicator: () => <div data-testid="step-indicator" />,
-}));
-
 vi.mock("./Step1Identity", () => ({
   Step1Identity: () => <div>Step 1</div>,
 }));
@@ -107,6 +103,9 @@ describe("WizardContainer", () => {
     expect(incompleteMarkup).toContain("LotusOzoneLogo.png");
     expect(incompleteMarkup).toContain("Direct Call");
     expect(incompleteMarkup).toContain("WhatsApp");
+    expect(incompleteMarkup).toContain('data-slot="wizard-stepper"');
+    expect(incompleteMarkup).toContain("Previous");
+    expect(incompleteMarkup).toContain("Next");
     expect(incompleteMarkup).toContain("What happens next?");
     expect(incompleteMarkup).toContain("Prefer to Speak Directly?");
 

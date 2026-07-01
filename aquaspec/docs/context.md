@@ -106,5 +106,5 @@ A saved set of inputs and results representing one customer's water treatment si
 - **Typography:** Inter drives body copy and step numbers, while heading moments use the branded display stack already wired through `--font-heading`.
 - **Card Treatment:** Main wizard cards and support sections use soft white surfaces, clean teal borders, and restrained drop shadows instead of the earlier warm beige shell.
 - **Field Styling:** Inputs and selects keep colored borders, larger hit areas, and glassy white fills without inline red error copy.
-- **Navigation Feedback:** The sticky footer stepper blocks invalid forward movement and animates each section badge into green success or red error states.
+- **Navigation Feedback:** The main wizard card now uses a combined ReactBits-style stepper shell that blocks invalid forward movement and animates each section badge into green success or red error states.
 - **Support CTA Areas:** The form rail now continues into a “What happens next?” explainer and a direct-contact section with call and WhatsApp cards.

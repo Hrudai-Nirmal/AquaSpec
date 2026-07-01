@@ -16,7 +16,7 @@ import {
   PhoneCallIcon,
   SendHorizonalIcon,
 } from "lucide-react";
-import { StepIndicator } from "./StepIndicator";
+import Stepper, { Step } from "./Stepper";
 import { Step1Identity } from "./Step1Identity";
 import { Step2WaterProfile } from "./Step2WaterProfile";
 import { Step3Hydraulics } from "./Step3Hydraulics";
@@ -26,36 +26,13 @@ import { ResultsPanel } from "@/components/results/ResultsPanel";
 import { ProposalPreview } from "@/components/proposal/ProposalPreview";
 import { SavedConfigsSidebar } from "@/components/configs/SavedConfigsSidebar";
 
-function StepContent() {
-  const activeStep = useStore((s) => s.activeStep);
-
-  switch (activeStep) {
-    case 1:
-      return <Step1Identity />;
-    case 2:
-      return <Step2WaterProfile />;
-    case 3:
-      return <Step3Hydraulics />;
-    case 4:
-      return <Step4Disinfection />;
-    case 5:
-      return <Step5Review />;
-    default:
-      return null;
-  }
-}
-
-function StepTitle() {
-  const activeStep = useStore((s) => s.activeStep);
-  const titles: Record<number, string> = {
-    1: "Hatchery Identity",
-    2: "Water Profile",
-    3: "Hydraulic Parameters",
-    4: "Disinfection Target",
-    5: "Review & Generate",
-  };
-  return <>{titles[activeStep] || ""}</>;
-}
+const STEP_TITLES = [
+  "Hatchery Identity",
+  "Water Profile",
+  "Hydraulic Parameters",
+  "Disinfection Target",
+  "Review & Generate",
+];
 
 function JourneySection() {
   const journeySteps = [
@@ -153,8 +130,11 @@ function ContactSection() {
 /** Renders the branded wizard shell without changing sizing behavior. */
 export function WizardContainer() {
   const isHydrated = useStore((s) => s.isHydrated);
+  const activeStep = useStore((s) => s.activeStep);
   const clearDraft = useStore((s) => s.clearDraft);
   const recommendation = useStore((s) => s.recommendation);
+  const setActiveStep = useStore((s) => s.setActiveStep);
+  const validateStep = useStore((s) => s.validateStep);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const shouldShowDesktopResults = recommendation !== null;
 
@@ -242,17 +222,57 @@ export function WizardContainer() {
                 </CardContent>
               </Card>
             ) : (
-              <>
-                <h2 className="mb-5 font-heading text-[2rem] font-semibold text-foreground">
-                  <StepTitle />
-                </h2>
-
-                <Card className="card-accent shadow-[0_28px_80px_-52px_rgba(15,23,42,0.36)]">
-                  <CardContent className="pt-8">
-                    <StepContent />
-                  </CardContent>
-                </Card>
-              </>
+              <Stepper
+                currentStep={activeStep}
+                initialStep={1}
+                onStepChange={setActiveStep}
+                canAdvanceFromStep={validateStep}
+                backButtonText="Previous"
+                nextButtonText="Next"
+                stepLabels={["Identity", "Water", "Hydraulics", "Disinfect", "Review"]}
+                stepCircleContainerClassName="card-accent"
+              >
+                <Step>
+                  <div className="space-y-6">
+                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                      {STEP_TITLES[0]}
+                    </h2>
+                    <Step1Identity />
+                  </div>
+                </Step>
+                <Step>
+                  <div className="space-y-6">
+                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                      {STEP_TITLES[1]}
+                    </h2>
+                    <Step2WaterProfile />
+                  </div>
+                </Step>
+                <Step>
+                  <div className="space-y-6">
+                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                      {STEP_TITLES[2]}
+                    </h2>
+                    <Step3Hydraulics />
+                  </div>
+                </Step>
+                <Step>
+                  <div className="space-y-6">
+                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                      {STEP_TITLES[3]}
+                    </h2>
+                    <Step4Disinfection />
+                  </div>
+                </Step>
+                <Step>
+                  <div className="space-y-6">
+                    <h2 className="font-heading text-[2rem] font-semibold text-foreground">
+                      {STEP_TITLES[4]}
+                    </h2>
+                    <Step5Review />
+                  </div>
+                </Step>
+              </Stepper>
             )}
           </div>
 
@@ -274,9 +294,6 @@ export function WizardContainer() {
           </div>
         ) : null}
       </div>
-
-      {/* Bottom navigation */}
-      <StepIndicator />
 
       {/* Proposal preview modal */}
       <ProposalPreview />
