@@ -199,6 +199,36 @@ interface FormState {
 
 let computeTimeout: ReturnType<typeof setTimeout> | null = null;
 const COMPUTE_DEBOUNCE_MS = 300;
+export const COMPUTE_TIMEOUT_MS = 15_000;
+
+/**
+ * Prevents the UI from getting stuck in a permanent loading state when the
+ * sizing API request never resolves in the browser.
+ */
+async function requestSizingRecommendation(
+  hatcheryInput: z.infer<typeof HatcheryInput>
+): Promise<Response> {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  try {
+    return await Promise.race([
+      fetch("/api/size", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(hatcheryInput),
+      }),
+      new Promise<Response>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error("Sizing request timed out. Please try again."));
+        }, COMPUTE_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+}
 
 // ─── Store ─────────────────────────────────────────────────────────────────
 
@@ -344,11 +374,7 @@ export const useStore = create<FormState>((set, get) => ({
         state.systems
       );
 
-      const resp = await fetch("/api/size", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(hatcheryInput),
-      });
+      const resp = await requestSizingRecommendation(hatcheryInput);
 
       if (!resp.ok) {
         const err = await resp.json();

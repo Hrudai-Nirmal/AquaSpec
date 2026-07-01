@@ -133,10 +133,13 @@ export function WizardContainer() {
   const activeStep = useStore((s) => s.activeStep);
   const clearDraft = useStore((s) => s.clearDraft);
   const recommendation = useStore((s) => s.recommendation);
+  const isComputing = useStore((s) => s.isComputing);
+  const computeError = useStore((s) => s.computeError);
   const setActiveStep = useStore((s) => s.setActiveStep);
   const validateStep = useStore((s) => s.validateStep);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const shouldShowDesktopResults = recommendation !== null;
+  const shouldShowDesktopResults =
+    recommendation !== null || isComputing || computeError !== null;
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -210,7 +213,7 @@ export function WizardContainer() {
       {/* Main content area */}
       <div className="relative flex flex-1 flex-col overflow-hidden lg:flex-row min-h-0">
         {/* Form panel (scrollable) */}
-        <div className="flex-1 overflow-y-auto px-4 py-8 lg:px-8">
+        <div className="flex-1 overflow-y-auto px-4 pt-8 pb-16 lg:px-8 lg:pb-24">
           <div className="mx-auto max-w-[720px]">
             {/* Hydration guard: don't render form until state is loaded */}
             {!isHydrated ? (
@@ -281,7 +284,7 @@ export function WizardContainer() {
             <ResultsPanel />
           </div>
 
-          <div className="mx-auto mt-10 max-w-5xl space-y-8">
+          <div className="mx-auto mt-16 max-w-5xl space-y-8 md:mt-20">
             <JourneySection />
             <ContactSection />
           </div>

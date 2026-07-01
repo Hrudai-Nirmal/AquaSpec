@@ -47,6 +47,8 @@ const mockStoreState = {
   isHydrated: true,
   clearDraft: vi.fn(async () => {}),
   recommendation: null as HatcheryRecommendation | null,
+  isComputing: false,
+  computeError: null as string | null,
 };
 
 vi.mock("@/lib/store", () => ({
@@ -91,6 +93,8 @@ describe("WizardContainer", () => {
     mockStoreState.activeStep = 1;
     mockStoreState.isHydrated = true;
     mockStoreState.recommendation = null;
+    mockStoreState.isComputing = false;
+    mockStoreState.computeError = null;
     mockStoreState.clearDraft.mockClear();
   });
 
@@ -118,5 +122,15 @@ describe("WizardContainer", () => {
     expect(readyPanelCount).toBe(2);
     expect(readyMarkup).toContain("animate-slide-in-right");
     expect(readyMarkup).toContain("Submit Quote Request");
+  });
+
+  it("mounts the desktop results panel while recommendations are computing", () => {
+    mockStoreState.isComputing = true;
+
+    const markup = renderToStaticMarkup(<WizardContainer />);
+    const panelCount = markup.match(/data-testid="results-panel"/g)?.length ?? 0;
+
+    expect(panelCount).toBe(2);
+    expect(markup).toContain("animate-slide-in-right");
   });
 });
