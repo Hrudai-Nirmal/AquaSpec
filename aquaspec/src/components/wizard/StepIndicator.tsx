@@ -15,7 +15,7 @@ export function StepIndicator() {
 
   return (
     <div className="footer-frost sticky bottom-0 z-40 border-t border-border/80 bg-card/85 backdrop-blur-md shadow-[0_-18px_40px_-28px_rgba(63,70,80,0.42)]">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <div className="relative mx-auto flex max-w-4xl items-center justify-center gap-3 px-4 py-3">
         <Button
           variant="outline"
           size="sm"
@@ -26,7 +26,7 @@ export function StepIndicator() {
           Previous
         </Button>
 
-        <div className="flex items-center gap-0">
+        <div className="flex items-center gap-0 mx-1">
           {STEP_LABELS.map((label, idx) => {
             const step = idx + 1;
             const isActive = step === activeStep;

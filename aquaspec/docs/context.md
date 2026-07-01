@@ -102,8 +102,8 @@ A saved set of inputs and results representing one customer's water treatment si
 - **Data Files:** JSON (sizing rules, static pricing text)
 
 ## Visual System
-- **Brand Direction:** Lotus Ozone light-mode visual language using `#81A6C6`, `#AACDDC`, `#F3E3D0`, and `#D2C4B4`, with the real `public/LotusOzoneLogo.png` in the header.
+- **Brand Direction:** Lotus Ozone light-mode visual language using `#007979`, `#24B1B1`, `#6FD1D7`, and `#FFF0E4`, with the real `public/LotusOzoneLogo.png` in the header.
 - **Typography:** Inter for body and controls, Cormorant Garamond for headings, card titles, and key numeric values.
-- **Card Treatment:** Main wizard cards use a warm blue-beige accent treatment via the shared `.card-accent` class.
-- **Field Styling:** Inputs and selects use colored borders based on the primary palette rather than neutral gray outlines.
+- **Card Treatment:** Main wizard cards use a glassy teal accent treatment via the shared `.card-accent` class.
+- **Field Styling:** Inputs and selects use teal borders and sit inside a blurred glass contact panel on Step 1.
 - **Results Behavior:** The desktop results rail only appears once a recommendation exists; mobile keeps the inline results panel below the form.

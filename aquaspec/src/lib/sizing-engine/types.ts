@@ -81,6 +81,16 @@ export const HatcheryInput = z.object({
   mode: HatcheryMode,
   /** Hatchery name for identification */
   name: z.string().min(1),
+  /** Primary contact full name */
+  fullName: z.string().min(1).optional(),
+  /** Business email for the contact */
+  emailAddress: z.string().email().optional(),
+  /** Selected dialing prefix */
+  phoneCountryCode: z.string().min(1).optional(),
+  /** Contact phone number without formatting constraints */
+  phoneNumber: z.string().min(1).optional(),
+  /** Business location shown in the wizard and persisted with the config */
+  location: z.string().min(1).optional(),
   /** One system in aggregate mode, N systems in multi_system mode */
   systems: z.array(SystemInput).min(1),
 }).refine(

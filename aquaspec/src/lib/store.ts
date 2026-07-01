@@ -137,12 +137,22 @@ function validateSystem(sys: SystemData): Record<string, string> {
 
 function buildHatcheryInput(
   name: string,
+  fullName: string,
+  emailAddress: string,
+  phoneCountryCode: string,
+  phoneNumber: string,
+  location: string,
   mode: "aggregate" | "multi_system",
   systems: SystemData[]
 ): z.infer<typeof HatcheryInput> {
   return {
     mode,
     name,
+    ...(fullName.trim() !== "" ? { fullName } : {}),
+    ...(emailAddress.trim() !== "" ? { emailAddress } : {}),
+    ...(phoneCountryCode.trim() !== "" ? { phoneCountryCode } : {}),
+    ...(phoneNumber.trim() !== "" ? { phoneNumber } : {}),
+    ...(location.trim() !== "" ? { location } : {}),
     systems: systems.map((s) => ({
       name: s.name,
       waterSource: s.waterSource as z.infer<typeof WaterSource>,
@@ -173,7 +183,16 @@ function setPristine(input: z.infer<typeof HatcheryInput>): void {
 function isDirty(): boolean {
   if (pristineInput === null) return false;
   const state = useStore.getState();
-  const current = buildHatcheryInput(state.hatcheryName, state.mode, state.systems);
+  const current = buildHatcheryInput(
+    state.hatcheryName,
+    state.fullName,
+    state.emailAddress,
+    state.phoneCountryCode,
+    state.phoneNumber,
+    state.location,
+    state.mode,
+    state.systems
+  );
   return JSON.stringify(current) !== JSON.stringify(pristineInput);
 }
 
@@ -189,6 +208,11 @@ interface FormState {
 
   // Form data
   hatcheryName: string;
+  fullName: string;
+  emailAddress: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  location: string;
   mode: "aggregate" | "multi_system";
   systems: SystemData[];
 
@@ -256,6 +280,11 @@ export const useStore = create<FormState>((set, get) => ({
   activeSystemIndex: 0,
   isHydrated: false,
   hatcheryName: "",
+  fullName: "",
+  emailAddress: "",
+  phoneCountryCode: "+91",
+  phoneNumber: "",
+  location: "",
   mode: "aggregate",
   systems: [{ ...emptySystem(), name: "System 1" }],
   fieldErrors: {},
@@ -290,8 +319,15 @@ export const useStore = create<FormState>((set, get) => ({
         const newSystems = [...state.systems];
         newSystems[idx] = { ...newSystems[idx], [field]: value };
         return { systems: newSystems };
-      } else if (parts[0] === "hatcheryName") {
-        return { hatcheryName: value };
+      } else if (
+        parts[0] === "hatcheryName" ||
+        parts[0] === "fullName" ||
+        parts[0] === "emailAddress" ||
+        parts[0] === "phoneCountryCode" ||
+        parts[0] === "phoneNumber" ||
+        parts[0] === "location"
+      ) {
+        return { [parts[0]]: value } as Partial<FormState>;
       }
       return {};
     });
@@ -367,6 +403,11 @@ export const useStore = create<FormState>((set, get) => ({
     try {
       const hatcheryInput = buildHatcheryInput(
         state.hatcheryName,
+        state.fullName,
+        state.emailAddress,
+        state.phoneCountryCode,
+        state.phoneNumber,
+        state.location,
         state.mode,
         state.systems
       );
@@ -459,6 +500,11 @@ export const useStore = create<FormState>((set, get) => ({
     // Reset store to default empty state
     set({
       hatcheryName: "",
+      fullName: "",
+      emailAddress: "",
+      phoneCountryCode: "+91",
+      phoneNumber: "",
+      location: "",
       mode: "aggregate",
       activeStep: 1,
       activeSystemIndex: 0,
@@ -515,6 +561,11 @@ export const useStore = create<FormState>((set, get) => ({
     set({
       activeConfigId: config.id,
       hatcheryName: config.input.name,
+      fullName: config.input.fullName ?? "",
+      emailAddress: config.input.emailAddress ?? "",
+      phoneCountryCode: config.input.phoneCountryCode ?? "+91",
+      phoneNumber: config.input.phoneNumber ?? "",
+      location: config.input.location ?? "",
       mode: config.input.mode,
       systems,
       activeStep: 1,
@@ -530,7 +581,18 @@ export const useStore = create<FormState>((set, get) => ({
     });
 
     // Set pristine snapshot for stale-edit detection
-    setPristine(buildHatcheryInput(config.input.name, config.input.mode, systems));
+    setPristine(
+      buildHatcheryInput(
+        config.input.name,
+        config.input.fullName ?? "",
+        config.input.emailAddress ?? "",
+        config.input.phoneCountryCode ?? "+91",
+        config.input.phoneNumber ?? "",
+        config.input.location ?? "",
+        config.input.mode,
+        systems
+      )
+    );
   },
 
   saveConfig: async (name: string) => {
@@ -542,6 +604,11 @@ export const useStore = create<FormState>((set, get) => ({
 
     const hatcheryInput = buildHatcheryInput(
       state.hatcheryName,
+      state.fullName,
+      state.emailAddress,
+      state.phoneCountryCode,
+      state.phoneNumber,
+      state.location,
       state.mode,
       state.systems
     );
@@ -581,6 +648,11 @@ export const useStore = create<FormState>((set, get) => ({
       await clearPersistenceDraft();
       set({
         hatcheryName: "",
+        fullName: "",
+        emailAddress: "",
+        phoneCountryCode: "+91",
+        phoneNumber: "",
+        location: "",
         mode: "aggregate",
         activeStep: 1,
         activeSystemIndex: 0,
@@ -618,6 +690,11 @@ function extractDraftData(state: FormState): DraftData {
   return {
     schemaVersion: 1,
     hatcheryName: state.hatcheryName,
+    fullName: state.fullName,
+    emailAddress: state.emailAddress,
+    phoneCountryCode: state.phoneCountryCode,
+    phoneNumber: state.phoneNumber,
+    location: state.location,
     mode: state.mode,
     activeStep: state.activeStep,
     activeSystemIndex: state.activeSystemIndex,
@@ -664,6 +741,11 @@ useStore.subscribe((state) => {
       // Restore form state from draft
       useStore.setState({
         hatcheryName: draft.hatcheryName,
+        fullName: draft.fullName,
+        emailAddress: draft.emailAddress,
+        phoneCountryCode: draft.phoneCountryCode,
+        phoneNumber: draft.phoneNumber,
+        location: draft.location,
         mode: draft.mode,
         activeStep: draft.activeStep,
         activeSystemIndex: draft.activeSystemIndex,
@@ -710,7 +792,35 @@ function validateAndSchedule() {
   let allValid = true;
 
   if (!state.hatcheryName || state.hatcheryName.trim().length === 0) {
-    errors["hatcheryName"] = "Hatchery name is required";
+    errors["hatcheryName"] = "Company name is required";
+    allValid = false;
+  }
+
+  if (!state.fullName || state.fullName.trim().length === 0) {
+    errors["fullName"] = "Full name is required";
+    allValid = false;
+  }
+
+  if (!state.emailAddress || state.emailAddress.trim().length === 0) {
+    errors["emailAddress"] = "Email address is required";
+    allValid = false;
+  } else if (!z.email().safeParse(state.emailAddress).success) {
+    errors["emailAddress"] = "Enter a valid email address";
+    allValid = false;
+  }
+
+  if (!state.phoneCountryCode || state.phoneCountryCode.trim().length === 0) {
+    errors["phoneCountryCode"] = "Country code is required";
+    allValid = false;
+  }
+
+  if (!state.phoneNumber || state.phoneNumber.trim().length === 0) {
+    errors["phoneNumber"] = "Phone number is required";
+    allValid = false;
+  }
+
+  if (!state.location || state.location.trim().length === 0) {
+    errors["location"] = "Location is required";
     allValid = false;
   }
 
@@ -725,6 +835,11 @@ function validateAndSchedule() {
   const isValid =
     allValid &&
     state.hatcheryName.trim().length > 0 &&
+    state.fullName.trim().length > 0 &&
+    state.emailAddress.trim().length > 0 &&
+    state.phoneCountryCode.trim().length > 0 &&
+    state.phoneNumber.trim().length > 0 &&
+    state.location.trim().length > 0 &&
     (state.mode === "aggregate"
       ? state.systems.length === 1
       : state.systems.length >= 1);

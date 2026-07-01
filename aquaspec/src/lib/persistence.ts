@@ -28,6 +28,11 @@ export interface DraftSystemData {
 export interface DraftData {
   schemaVersion: number;
   hatcheryName: string;
+  fullName: string;
+  emailAddress: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  location: string;
   mode: "aggregate" | "multi_system";
   activeStep: number;
   activeSystemIndex: number;

@@ -45,6 +45,11 @@ function makeDraft(overrides: Partial<DraftData> = {}): DraftData {
   return {
     schemaVersion: 1,
     hatcheryName: "Test Hatchery",
+    fullName: "Test Person",
+    emailAddress: "test@example.com",
+    phoneCountryCode: "+91",
+    phoneNumber: "9876543210",
+    location: "Chennai, Tamil Nadu, India",
     mode: "aggregate",
     activeStep: 3,
     activeSystemIndex: 0,
@@ -72,6 +77,8 @@ describe("saveDraft + loadDraft round-trip", () => {
     expect(loaded).not.toBeNull();
     expect(loaded!.schemaVersion).toBe(1);
     expect(loaded!.hatcheryName).toBe("Test Hatchery");
+    expect(loaded!.fullName).toBe("Test Person");
+    expect(loaded!.emailAddress).toBe("test@example.com");
     expect(loaded!.mode).toBe("aggregate");
     expect(loaded!.activeStep).toBe(3);
     expect(loaded!.activeSystemIndex).toBe(0);
@@ -104,6 +111,11 @@ describe("saveDraft + loadDraft round-trip", () => {
     const draft: DraftData = {
       schemaVersion: 1,
       hatcheryName: "Multi Hatchery",
+      fullName: "Multi Contact",
+      emailAddress: "multi@example.com",
+      phoneCountryCode: "+91",
+      phoneNumber: "9999999999",
+      location: "Mumbai, Maharashtra, India",
       mode: "multi_system",
       activeStep: 2,
       activeSystemIndex: 1,

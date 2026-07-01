@@ -5,11 +5,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Trash2Icon, PlusIcon } from "lucide-react";
+
+const COUNTRY_PREFIXES = [
+  "+91",
+  "+1",
+  "+44",
+  "+61",
+  "+65",
+  "+81",
+  "+971",
+];
 
 /** Captures the top-level hatchery identity and operating mode. */
 export function Step1Identity() {
   const hatcheryName = useStore((s) => s.hatcheryName);
+  const fullName = useStore((s) => s.fullName);
+  const emailAddress = useStore((s) => s.emailAddress);
+  const phoneCountryCode = useStore((s) => s.phoneCountryCode);
+  const phoneNumber = useStore((s) => s.phoneNumber);
+  const location = useStore((s) => s.location);
   const mode = useStore((s) => s.mode);
   const systems = useStore((s) => s.systems);
   const fieldErrors = useStore((s) => s.fieldErrors);
@@ -21,22 +43,102 @@ export function Step1Identity() {
 
   return (
     <div className="space-y-6">
-      {/* Hatchery Name */}
-      <div className="space-y-2">
-        <Label htmlFor="hatcheryName">Hatchery Name *</Label>
-        <Input
-          id="hatcheryName"
-          placeholder="e.g. Coastal Shrimp Hatchery"
-          value={hatcheryName}
-          onChange={(e) => {
-            updateField("hatcheryName", e.target.value);
-          }}
-        />
-        {fieldErrors["hatcheryName"] && (
-          <p className="text-xs text-destructive">
-            {fieldErrors["hatcheryName"]}
-          </p>
-        )}
+      <div className="glass-form rounded-xl border border-border/90 bg-white/32 p-5 backdrop-blur-xl space-y-5">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="fullName">Full Name *</Label>
+            <Input
+              id="fullName"
+              placeholder="Enter your full name"
+              value={fullName}
+              onChange={(e) => updateField("fullName", e.target.value)}
+            />
+            {fieldErrors["fullName"] && (
+              <p className="text-xs text-destructive">{fieldErrors["fullName"]}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="emailAddress">Email Address *</Label>
+            <Input
+              id="emailAddress"
+              type="email"
+              placeholder="your.email@company.com"
+              value={emailAddress}
+              onChange={(e) => updateField("emailAddress", e.target.value)}
+            />
+            {fieldErrors["emailAddress"] && (
+              <p className="text-xs text-destructive">
+                {fieldErrors["emailAddress"]}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-[160px_1fr]">
+          <div className="space-y-2">
+            <Label>Country Prefix *</Label>
+            <Select
+              value={phoneCountryCode}
+              onValueChange={(value) => updateField("phoneCountryCode", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="+91" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRY_PREFIXES.map((prefix) => (
+                  <SelectItem key={prefix} value={prefix}>
+                    {prefix}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Phone Number *</Label>
+            <Input
+              id="phoneNumber"
+              inputMode="tel"
+              placeholder="+91 xxxxx xxxxx"
+              value={phoneNumber}
+              onChange={(e) => updateField("phoneNumber", e.target.value)}
+            />
+            {fieldErrors["phoneNumber"] && (
+              <p className="text-xs text-destructive">{fieldErrors["phoneNumber"]}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="hatcheryName">Company Name *</Label>
+            <Input
+              id="hatcheryName"
+              placeholder="Your company name"
+              value={hatcheryName}
+              onChange={(e) => updateField("hatcheryName", e.target.value)}
+            />
+            {fieldErrors["hatcheryName"] && (
+              <p className="text-xs text-destructive">
+                {fieldErrors["hatcheryName"]}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">Location *</Label>
+            <Input
+              id="location"
+              placeholder="City, State, Country"
+              value={location}
+              onChange={(e) => updateField("location", e.target.value)}
+            />
+            {fieldErrors["location"] && (
+              <p className="text-xs text-destructive">{fieldErrors["location"]}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Mode Toggle */}
